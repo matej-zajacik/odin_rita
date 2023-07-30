@@ -36,7 +36,7 @@ init_game_options :: proc()
 
 load_game_options :: proc()
 {
-    util.read_json_file_to_obj(GAME_OPTIONS_FILE_NAME, &game_options)
+    util.read_json_file_to_obj(GAME_OPTIONS_FILE_NAME, &game_options, true)
 }
 
 

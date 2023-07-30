@@ -1,2 +1,2 @@
-..\..\odin\odin test .
+..\..\..\odin\odin test .
 pause
