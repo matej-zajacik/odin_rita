@@ -1,0 +1,25 @@
+{
+    "items": [
+        {
+            "id": "PLAYER",
+            "flags": "DAMAGEABLE, MOBILE, PAWN, TARGETABLE",
+            "speed": 5,
+            "acceleration": 0.5,
+            "radius": 32,
+            "mass": 1,
+            "health": 100,
+            "faction": "GOOD",
+            "default_proc": "tick_player"
+        },
+        {
+            "id": "SPIDERLING",
+            "flags": "DAMAGEABLE, MOBILE, PAWN, TARGETABLE",
+            "speed": 3.75,
+            "acceleration": 0.5,
+            "radius": 24,
+            "mass": 0.5,
+            "health": 30,
+            "faction": "EVIL"
+        }
+    ]
+}

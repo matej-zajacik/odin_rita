@@ -1,0 +1,83 @@
+{
+    "automappingRulesFile": "",
+    "commands": [
+    ],
+    "extensionsPath": "extensions",
+    "folders": [
+        "."
+    ],
+    "propertyTypes": [
+        {
+            "color": "#ffffff00",
+            "id": 1,
+            "members": [
+            ],
+            "name": "player_start",
+            "type": "class",
+            "useAs": [
+                "property",
+                "map",
+                "layer",
+                "object",
+                "tile",
+                "tileset",
+                "wangcolor",
+                "wangset"
+            ]
+        },
+        {
+            "color": "#ffff0000",
+            "id": 2,
+            "members": [
+                {
+                    "name": "flags",
+                    "propertyType": "monster_flags",
+                    "type": "string",
+                    "value": "easy,medium,hard"
+                },
+                {
+                    "name": "id",
+                    "propertyType": "monster_id",
+                    "type": "string",
+                    "value": "spiderling"
+                }
+            ],
+            "name": "monster",
+            "type": "class",
+            "useAs": [
+                "property",
+                "map",
+                "layer",
+                "object",
+                "tile",
+                "tileset",
+                "wangcolor",
+                "wangset"
+            ]
+        },
+        {
+            "id": 4,
+            "name": "monster_flags",
+            "storageType": "string",
+            "type": "enum",
+            "values": [
+                "easy",
+                "medium",
+                "hard",
+                "deaf"
+            ],
+            "valuesAsFlags": true
+        },
+        {
+            "id": 3,
+            "name": "monster_id",
+            "storageType": "string",
+            "type": "enum",
+            "values": [
+                "spiderling",
+                "welder_drone"
+            ],
+            "valuesAsFlags": false
+        }
+    ]
+}

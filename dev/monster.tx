@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<template>
+ <object class="monster" width="64" height="64">
+  <properties>
+   <property name="flags" propertytype="monster_flags" value="easy,medium,hard"/>
+   <property name="id" propertytype="monster_id" value="welder_drone"/>
+  </properties>
+ </object>
+</template>
