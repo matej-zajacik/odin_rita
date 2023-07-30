@@ -47,7 +47,7 @@ get_rect_bottom :: #force_inline proc(r: Rect) -> f32
 
 
 
-f32_move_towards :: proc(src: f32, dst: f32, max_delta: f32) -> f32
+move_towards_f32 :: proc(src: f32, dst: f32, max_delta: f32) -> f32
 {
     if src < dst
     {
@@ -65,7 +65,7 @@ f32_move_towards :: proc(src: f32, dst: f32, max_delta: f32) -> f32
 
 
 
-vector2_move_towards :: proc(src: Vector2, dst: Vector2, max_delta: f32) -> Vector2
+move_towards_vector2 :: proc(src: Vector2, dst: Vector2, max_delta: f32) -> Vector2
 {
     // Get the vector to the target point.
     v := dst - src
@@ -95,13 +95,13 @@ vector2_move_towards :: proc(src: Vector2, dst: Vector2, max_delta: f32) -> Vect
 
 move_towards :: proc
 {
-    f32_move_towards,
-    vector2_move_towards,
+    move_towards_f32,
+    move_towards_vector2,
 }
 
 
 
-rotate_vector2 :: proc(v: ^Vector2, angle: f32)
+rotate_vector :: proc(v: ^Vector2, angle: f32)
 {
     sin := math.sin(angle)
     cos := math.cos(angle)

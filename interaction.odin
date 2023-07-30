@@ -37,9 +37,9 @@ damage_actor :: proc(source: ^Actor, target: ^Actor, damage: int, flags: Damage_
 
         if .PIERCE_ARMOR not_in flags
         {
-            mitigated := min(mult_int(damage, ARMOR_MITIGATION), player_info.armor)
-            player_info.armor -= mitigated
-            damage -= mitigated
+            absorbed := min(mult_int(damage, ARMOR_MITIGATION), player_info.armor)
+            player_info.armor -= absorbed
+            damage -= absorbed
         }
     }
 

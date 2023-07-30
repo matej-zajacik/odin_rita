@@ -1,11 +1,5 @@
 package main
 
-import "core:encoding/json"
-import "core:fmt"
-import "core:log"
-import "core:reflect"
-import "core:runtime"
-
 
 
 Actor_Blueprint :: struct
@@ -33,13 +27,13 @@ Actor_Blueprint :: struct
     health:  int,
     faction: Faction,
 
-    // A function to call when the actor is first constructed.
+    // A proc to call when the actor is first constructed.
     make_proc: Actor_Proc,
 
-    // A function to call when the actor is spawned.
+    // A proc to call when the actor is spawned.
     spawn_proc: Actor_Proc,
 
-    // A function to call every frame after the actor spawns.
+    // A proc to call every frame after the actor spawns.
     default_proc: Actor_Proc,
 
     // A chase routine.
@@ -51,10 +45,10 @@ Actor_Blueprint :: struct
     // Sub-attack routines.
     sub_attack_procs: []Attack_Proc,
 
-    // A function called while the actor is dying.
+    // A proc called while the actor is dying.
     death_proc: Actor_Proc,
 
-    // A function to call when a projectile hits something.
+    // A proc to call when a projectile hits something.
     impact_proc: Impact_Proc,
 }
 

@@ -114,7 +114,7 @@ tick_player :: proc(player: ^Actor)
 
     if desired_dir != {}
     {
-        rotate_vector2(&desired_dir, -player.angle + math.PI / 2)
+        rotate_vector(&desired_dir, -player.angle + math.PI / 2)
         player.desired_dir = desired_dir
     }
     else

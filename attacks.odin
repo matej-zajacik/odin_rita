@@ -58,7 +58,8 @@ get_attack_targets :: proc(ignored_actor: ^Actor, sector: ^Sector, position: Vec
             continue
         }
 
-        dist := linalg.distance(position, target.position)
+        vec_to_target := target.position - position
+        dist := linalg.length(vec_to_target)
         log.infof("get_attack_targets: dist to %v is %v", target.id, dist)
 
         if dist > max_distance
@@ -67,7 +68,7 @@ get_attack_targets :: proc(ignored_actor: ^Actor, sector: ^Sector, position: Vec
             continue
         }
 
-        angle := get_angle_between_angle_and_vector(forward_angle, target.position - position)
+        angle := get_angle_between_angle_and_vector(forward_angle, vec_to_target)
         log.infof("get_attack_targets: angle to %v is %v", target.id, angle)
 
         if angle > max_angle

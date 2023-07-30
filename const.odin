@@ -14,6 +14,7 @@ MAX_ACTORS :: 256
 
 TILE_SIZE      :: 64
 HALF_TILE_SIZE :: TILE_SIZE / 2
+SECTOR_SIZE    :: 8
 
 //
 // Movement

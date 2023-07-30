@@ -191,7 +191,7 @@ make_actor :: proc(id: Actor_Id) -> ^Actor
 
     if bp.flags == {}
     {
-        log.panicf("No such blueprint id: %v", id)
+        log.panicf("no such blueprint id %v", id)
     }
 
     actor := new(Actor)

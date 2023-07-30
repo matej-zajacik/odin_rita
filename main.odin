@@ -93,7 +93,6 @@ init_game :: proc()
 
 
 
-
 tick_game :: proc(dt: f64)
 {
     current_frame  = queedo.current_frame
@@ -114,9 +113,11 @@ draw_game :: proc()
 
         for actor in actors
         {
+            // We don't draw actors yet.
             if actor == nil do continue
         }
 
+        // We only draw debug colliders.
         draw_colliders()
     }
     raylib.EndMode2D()
