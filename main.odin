@@ -96,9 +96,9 @@ init_game :: proc()
 
 tick_game :: proc(dt: f64)
 {
-    current_frame = queedo.current_frame
+    current_frame  = queedo.current_frame
     mouse_position = queedo.mouse_position
-    mouse_delta = queedo.mouse_delta
+    mouse_delta    = queedo.mouse_delta
 
     tick_actors()
     tick_camera()

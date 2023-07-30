@@ -93,33 +93,33 @@ tick_player :: proc(player: ^Actor)
     // Movement
     //
 
-    desired_direction: Vector2
+    desired_dir: Vector2
 
     if queedo.get_input_action(int(Input_Action.MOVE_FORWARD))
     {
-        desired_direction.y -= 1
+        desired_dir.y -= 1
     }
     if queedo.get_input_action(int(Input_Action.MOVE_BACKWARD))
     {
-        desired_direction.y += 1
+        desired_dir.y += 1
     }
     if queedo.get_input_action(int(Input_Action.MOVE_LEFT))
     {
-        desired_direction.x -= 1
+        desired_dir.x -= 1
     }
     if queedo.get_input_action(int(Input_Action.MOVE_RIGHT))
     {
-        desired_direction.x += 1
+        desired_dir.x += 1
     }
 
-    if desired_direction != {}
+    if desired_dir != {}
     {
-        rotate_vector2(&desired_direction, -player.angle + math.PI / 2)
-        player.desired_direction = desired_direction
+        rotate_vector2(&desired_dir, -player.angle + math.PI / 2)
+        player.desired_dir = desired_dir
     }
     else
     {
-        player.desired_direction = {}
+        player.desired_dir = {}
     }
 
     //

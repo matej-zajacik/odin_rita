@@ -12,7 +12,7 @@ import "shared:queedo"
 
 Actor_Proc  :: proc(actor: ^Actor)
 Attack_Proc :: proc(actor: ^Actor, phase: int) -> bool
-Impact_Proc :: proc(projectile: ^Actor, target: ^Actor, hit_point: raylib.Vector2, hit_normal: raylib.Vector2)
+Impact_Proc :: proc(projectile: ^Actor, target: ^Actor, hit_point: Vector2, hit_normal: Vector2)
 
 
 
@@ -26,7 +26,7 @@ Actor_Id :: enum
 
 Actor_Flag :: enum
 {
-    CHANGED_POSITION_THIS_FRAME,
+    MOVED_THIS_FRAME,
     DAMAGEABLE,
     IN_PLAY,
     MOBILE,
@@ -80,22 +80,22 @@ Actor :: struct
     // An index in the global `actors` array.
     array_index: int,
 
-    // The frame the actor was spawned on. This is to prevent it being ticked on the same frame it was spawned, and also to determine its current lifetime. This field is also reused when the actor is pooled, to determine the number of frames it has been in the pool.
+    // The frame the actor was spawned on. This is to prevent it being ticked on the same frame it was spawned, and also to determine its current lifetime.
     spawn_frame: int,
 
-    // The frame the actor is supposed to be automatically removed. This is to automate removal of temporary actors like explosions, impact effects, sounds, etc.
+    // The frame the actor is supposed to be automatically removed at. This is to automate removal of short-lived actors like explosions, impact effects, sounds, etc.
     removal_frame: int,
 
     //
     // Movement & physics
     //
 
-    position:          Vector2,
-    angle:             f32,
-    desired_direction: Vector2,
-    speed:             Vector2,
-    thrust_timer:      int,
-    sector:            ^Sector,
+    position:     Vector2,
+    angle:        f32,
+    desired_dir:  Vector2,
+    speed:        Vector2,
+    thrust_timer: int,
+    sector:       ^Sector,
 
     //
     // Behavior
@@ -138,7 +138,7 @@ init_actors :: proc()
 {
     for i in 0..<MAX_ACTORS
     {
-        append(&free_actor_indexes, MAX_ACTORS - 1 - i);
+        append(&free_actor_indexes, MAX_ACTORS - 1 - i)
     }
 }
 
@@ -153,18 +153,19 @@ get_actor_from_pool :: proc(id: Actor_Id) -> ^Actor
         return nil
     }
 
-    // We iterate from the end, because it's cheap to remove items from an array's end and it's very likely that the actor is re-usable.
+    // We iterate from the end, because it's cheap to remove items from an array's end and it's very likely that the actor is already re-usable.
     #reverse for &item, i in arr
     {
         // We can return a pooled actor only if it has been in the pool for at least 2 frames.
         if current_frame - item.pooled_frame > 1
         {
-            unordered_remove(arr, i);
-            return item.actor;
+            item_actor := item.actor
+            unordered_remove(arr, i)
+            return item_actor
         }
     }
 
-    return nil;
+    return nil
 }
 
 
@@ -187,25 +188,16 @@ make_actor :: proc(id: Actor_Id) -> ^Actor
     // fmt.println("Making actor", id)
 
     bp := &blueprints[id]
-    // fmt.println(bp)
-    // fmt.println(bp.flags)
-    flags := bp.flags
 
-    if flags == {}
+    if bp.flags == {}
     {
         log.panicf("No such blueprint id: %v", id)
     }
-    // fmt.assertf(flags != {}, "No such blueprint id: %v", id)
 
     actor := new(Actor)
 
-    actor.spawn_frame = 0
-
     actor.id = id
     actor.bp = bp
-    actor.flags = flags
-
-    // add_body_to_actor(actor);
 
     if bp.make_proc != nil
     {
@@ -217,7 +209,7 @@ make_actor :: proc(id: Actor_Id) -> ^Actor
 
 
 
-spawn_actor :: proc(id: Actor_Id, position: raylib.Vector2, angle: f32) -> ^Actor
+spawn_actor :: proc(id: Actor_Id, position: Vector2, angle: f32) -> ^Actor
 {
     assert(actor_count < MAX_ACTORS)
 
@@ -235,7 +227,9 @@ spawn_actor :: proc(id: Actor_Id, position: raylib.Vector2, angle: f32) -> ^Acto
     //
 
     bp := actor.bp
-    flags := bp.flags
+
+    // Reset our flags and add a flag denoting that we're in play now.
+    actor.flags = bp.flags + {.IN_PLAY}
 
     //
     // Maintenance
@@ -252,14 +246,11 @@ spawn_actor :: proc(id: Actor_Id, position: raylib.Vector2, angle: f32) -> ^Acto
     // Make sure the game doesn't remove the actor automatically later on (unless told to specifically somewhere down the line).
     actor.removal_frame = -1
 
-    // Reset our flags and add a flag denoting that we're in play now.
-    actor.flags = flags + {.IN_PLAY}
-
     //
     // Movement & physics
     //
 
-    actor.desired_direction = {}
+    actor.desired_dir = {}
     actor.speed = {}
     actor.thrust_timer = 0
     actor.sector = nil
@@ -304,7 +295,7 @@ remove_actor :: proc(actor: ^Actor, delay: int = 0)
     if delay > 0
     {
         actor.removal_frame = current_frame + delay
-        return;
+        return
     }
 
     actors[actor.array_index] = nil
@@ -330,7 +321,7 @@ tick_actors :: proc()
             continue
         }
 
-        // If our target is out of play, so we need to remove it.
+        // If our target is out of play, we need to remove it.
         if actor.target != nil && .IN_PLAY not_in actor.target.flags
         {
             actor.target = nil
@@ -361,7 +352,7 @@ tick_actors :: proc()
 
     for actor in mobile_actors
     {
-        if actor.speed == {} && .CHANGED_POSITION_THIS_FRAME not_in actor.flags
+        if actor.speed == {} && .MOVED_THIS_FRAME not_in actor.flags
         {
             continue
         }
@@ -372,12 +363,13 @@ tick_actors :: proc()
         {
             if other == actor do continue
 
-            dist := linalg.distance(actor.position, other.position)
+            other_to_actor_vec := actor.position - other.position
+            dist := linalg.length(other_to_actor_vec)
             radii := actor.bp.radius + other.bp.radius
 
             if dist < radii
             {
-                dir := linalg.normalize(actor.position - other.position)
+                dir := linalg.normalize(other_to_actor_vec)
                 move_actor(actor, dir * (radii - dist))
             }
         }
@@ -387,6 +379,8 @@ tick_actors :: proc()
     // Actors vs geometry
     //
 
+    // We test against geometry only after all actor-vs-actor tests are done, because geometry has higher priority (must be solid and cannot be moved through).
+
     for actor in mobile_actors
     {
         c := Circle{actor.position.x, actor.position.y, actor.bp.radius}
@@ -395,18 +389,10 @@ tick_actors :: proc()
         {
             if hit, dep := circle_intersects_rect(c, rect^); hit
             {
-                // log.infof("%v (%v) collides with %v", actor.id, c, rect^)
                 move_actor(actor, dep)
 
-                if dep.x != 0.0
-                {
-                    actor.speed.x = 0.0
-                }
-
-                if dep.y != 0.0
-                {
-                    actor.speed.y = 0.0
-                }
+                if dep.x != 0.0 do actor.speed.x = 0.0
+                if dep.y != 0.0 do actor.speed.y = 0.0
             }
         }
     }
@@ -418,10 +404,10 @@ tick_actors :: proc()
 
     for actor in mobile_actors
     {
-        if .CHANGED_POSITION_THIS_FRAME not_in actor.flags do return
+        if .MOVED_THIS_FRAME not_in actor.flags do continue
 
         update_actor_sector(actor)
-        actor.flags -= {.CHANGED_POSITION_THIS_FRAME}
+        actor.flags -= {.MOVED_THIS_FRAME}
     }
 
 
@@ -431,7 +417,7 @@ tick_actors :: proc()
         if delta == {} do return
 
         actor.position += delta
-        actor.flags += {.CHANGED_POSITION_THIS_FRAME}
+        actor.flags += {.MOVED_THIS_FRAME}
     }
 }
 
@@ -440,11 +426,11 @@ tick_actors :: proc()
 // Calculates a new speed based on the actor's desired direction of movement.
 update_actor_speed :: proc(actor: ^Actor)
 {
-    dir := actor.desired_direction
+    dir := actor.desired_dir
 
-    // The rate of acceleration towards the target speed varies based on some conditons.
+    // The rate of acceleration towards the target speed varies based on some conditions.
     acceleration_mult: f32
-    target_speed: Vector2
+    target_speed:      Vector2
 
     speed := actor.speed
 
@@ -485,11 +471,19 @@ update_actor_speed :: proc(actor: ^Actor)
 
 
 
-
+// Should be called when the actor's position is supposed to suddenly change (when spawned, teleported, and such).
+// Standard movement code doesn't call this.
 set_actor_position :: proc(actor: ^Actor, position: Vector2)
 {
     actor.position = position
     update_actor_sector(actor)
+}
+
+
+
+set_actor_angle :: proc(actor: ^Actor, angle: f32)
+{
+    actor.angle = get_wrapped_angle(angle)
 }
 
 
@@ -509,7 +503,7 @@ update_actor_sector :: proc(actor: ^Actor)
     }
 
     // If it's the same sector that we already have, we don't need to do anything.
-    if actor.sector == sector do return
+    if sector == actor.sector do return
 
     if actor.sector != nil
     {
@@ -526,7 +520,7 @@ update_actor_sector :: proc(actor: ^Actor)
     {
         // log.infof("update_actor_sector: actor %v added to sector %v,%v", actor.id, sector.debug_tile_pos_x, sector.debug_tile_pos_y)
 
-        // If we are ordered to set a real sector, we add ourselves to it and its neighbors.
+        // If we are ordered to set a sector (because we may be order to set nil), we add ourselves to it and its neighbors.
         append(&sector.actors, actor)
 
         for neighbor_sector in sector.neighbors
@@ -538,13 +532,6 @@ update_actor_sector :: proc(actor: ^Actor)
 
     // And we set the new sector as our current sector.
     actor.sector = sector
-}
-
-
-
-set_actor_angle :: proc(actor: ^Actor, angle: f32)
-{
-    actor.angle = get_wrapped_angle(angle)
 }
 
 
