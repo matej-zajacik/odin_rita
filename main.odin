@@ -89,6 +89,8 @@ init_game :: proc()
     reset_camera()
     load_map("data/test_map.json")
 
+    init_scanline_fx()
+
     test()
 }
 
@@ -125,6 +127,8 @@ draw_game :: proc()
 
     text := strings.clone_to_cstring(fmt.tprintf("ang: %v (%v°)", player.angle, math.to_degrees(player.angle)), context.temp_allocator)
     raylib.DrawText(text, 8, 8, 16, raylib.WHITE)
+
+    raylib.DrawTexture(scanline_tex, 0, 0, raylib.WHITE)
 }
 
 
