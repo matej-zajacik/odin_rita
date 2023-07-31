@@ -7,6 +7,7 @@ import "core:math/linalg"
 import "core:os"
 import "core:slice"
 import "core:strings"
+import "vendor:raylib"
 
 
 
@@ -161,11 +162,45 @@ get_wrapped_angle :: proc(angle: f32) -> f32
 
 
 
-// get_angle_between_actor_forward_and_other_actor :: proc(a: ^Actor, b: ^Actor) -> f32
-// {
-//     b_angle := get_vector_angle(b.position - a.position)
-//     return math.abs(a.angle - b_angle)
-// }
+rects_intersect :: proc(a: Rect, b: Rect) -> bool
+{
+    return get_rect_left(a) < get_rect_right(b) &&
+           get_rect_left(b) < get_rect_right(a) &&
+           get_rect_top(a) < get_rect_bottom(b) &&
+           get_rect_top(b) < get_rect_bottom(a)
+}
+
+
+
+circle_intersects_rect :: proc(c: Circle, r: Rect) -> (hit: bool, depenetration: Vector2)
+{
+    // Find the closest point to the circle within the rectangle.
+    closest_x := math.clamp(c.x, get_rect_left(r), get_rect_right(r))
+    closest_y := math.clamp(c.y, get_rect_top(r), get_rect_bottom(r))
+
+    // Calc the distance between the circle's center and the closest point.
+    dist_x := c.x - closest_x
+    dist_y := c.y - closest_y
+    dist_sq := dist_x * dist_x + dist_y * dist_y
+
+    // If the distance is less than the circle's radius, we have an intersection.
+    hit = dist_sq < c.r * c.r
+
+    if hit
+    {
+        if dist_x != 0.0
+        {
+            depenetration.x = (c.r - math.abs(dist_x)) * math.sign(dist_x)
+        }
+
+        if dist_y != 0.0
+        {
+            depenetration.y = (c.r - math.abs(dist_y)) * math.sign(dist_y)
+        }
+    }
+
+    return
+}
 
 
 
@@ -201,8 +236,24 @@ mult_int_ptr :: proc(val: ^int, mult: f32)
 }
 
 
+
 mult_int :: proc
 {
     mult_int_val,
     mult_int_ptr,
+}
+
+
+
+draw_circle :: proc(center: Vector2, radius: f32, thick: f32, color: Color, segments: int = 16)
+{
+    step_angle := math.TAU / f32(segments)
+    start := center + {math.cos(step_angle * f32(0)), math.sin(step_angle * f32(0))} * radius
+
+    for i in 1..<segments + 1
+    {
+        end := center + {math.cos(step_angle * f32(i)), math.sin(step_angle * f32(i))} * radius
+        raylib.DrawLineEx(start, end, thick, color)
+        start = end
+    }
 }

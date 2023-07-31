@@ -14,6 +14,7 @@ import "shared:queedo"
 
 Vector2 :: raylib.Vector2
 Rect    :: raylib.Rectangle
+Color   :: raylib.Color
 
 
 
@@ -45,10 +46,10 @@ mouse_delta:    raylib.Vector2
 main :: proc()
 {
     s: queedo.Init_Settings;
-    s.window_title = "Rita"
-    s.window_width = 1600
+    s.window_title  = "Rita"
+    s.window_width  = 1600
     s.window_height = 900
-    s.frame_rate = 60
+    s.frame_rate    = FRAME_RATE
     s.init_callback = init_game
     s.tick_callback = tick_game
     s.draw_callback = draw_game
@@ -69,7 +70,7 @@ init_game :: proc()
     load_game_options()
     save_game_options()
 
-    load_blueprints()
+    init_blueprints()
     init_actors()
 
     queedo.init_input_actions(len(Input_Action))
@@ -109,7 +110,7 @@ draw_game :: proc()
 {
     raylib.BeginMode2D(main_cam)
     {
-        raylib.DrawTextureEx(map_tex, {}, 0.0, 1.0, raylib.WHITE)
+        raylib.DrawTextureEx(map_tex, {}, 0.0, 1.0 / TILE_SIZE, raylib.WHITE)
 
         for actor in actors
         {
@@ -136,5 +137,5 @@ quit_game :: proc()
 
 test :: proc()
 {
-    spawn_actor(.SPIDERLING, {300, 300}, 0)
+    spawn_actor(.SPIDERLING, {5, 5}, 0)
 }

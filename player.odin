@@ -69,14 +69,14 @@ spawn_player :: proc(position: Vector2, angle: f32)
 
     gun: ^Gun
 
-    gun = &player_info.guns[.WRENCH]
-    gun.id = .WRENCH
+    gun                 = &player_info.guns[.WRENCH]
+    gun.id              = .WRENCH
     gun.attack_procs[0] = wrench_attack
 
-    gun = &player_info.guns[.PISTOL]
-    gun.id = .PISTOL
-    gun.ammo_id = .BULLET
-    gun.ammo_cost[0] = 1
+    gun                 = &player_info.guns[.PISTOL]
+    gun.id              = .PISTOL
+    gun.ammo_id         = .BULLET
+    gun.ammo_costs[0]   = 1
     gun.attack_procs[0] = pistol_attack
 }
 

@@ -55,3 +55,18 @@ Actor_Blueprint :: struct
 
 
 blueprints: [len(Actor_Id)]Actor_Blueprint
+
+
+
+init_blueprints :: proc()
+{
+    load_blueprints()
+
+    // Certain values need further processing.
+    // At runtime, we want everything to be in "unit per frame", but JSON data is in "unit per tile" which is more natural for humans.
+    for &bp in blueprints
+    {
+        bp.speed /= FRAME_RATE
+        bp.acceleration /= FRAME_RATE
+    }
+}

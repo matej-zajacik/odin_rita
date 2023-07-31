@@ -40,9 +40,9 @@ Map_JSON :: struct
 
 
 geo_colliders: [dynamic]Rect
-map_tex: raylib.Texture2D
-map_width: int
-map_height: int
+map_tex:       raylib.Texture2D
+map_width:     int
+map_height:    int
 
 
 
@@ -197,7 +197,7 @@ load_map :: proc(file_name: string)
                     {
                         for &obj in layer.objects
                         {
-                            r := Rect{f32(obj.x), f32(obj.y), f32(obj.width), f32(obj.height)}
+                            r := Rect{f32(obj.x) / TILE_SIZE, f32(obj.y)  / TILE_SIZE, f32(obj.width)  / TILE_SIZE, f32(obj.height)  / TILE_SIZE}
                             append(&geo_colliders, r)
                         }
                     }
@@ -216,6 +216,7 @@ load_map :: proc(file_name: string)
 
     if player_start_found
     {
+        // log.infof("player_start_position: %v", player_start_position)
         spawn_player(player_start_position, 0)
     }
 
@@ -223,7 +224,7 @@ load_map :: proc(file_name: string)
 
     get_object_position :: proc(x: int, y: int) -> Vector2
     {
-        return Vector2{f32(x + HALF_TILE_SIZE), f32(y + HALF_TILE_SIZE)}
+        return Vector2{f32(x + HALF_TILE_SIZE) / TILE_SIZE, f32(y + HALF_TILE_SIZE) / TILE_SIZE}
     }
 }
 
@@ -275,7 +276,8 @@ init_sectors :: proc()
 
         sector.debug_tile_pos_x = x
         sector.debug_tile_pos_y = y
-        sector.debug_rect = Rect{f32(x * TILE_SIZE * SECTOR_SIZE), f32(y * TILE_SIZE * SECTOR_SIZE), f32(TILE_SIZE * SECTOR_SIZE), f32(TILE_SIZE * SECTOR_SIZE)}
+        // sector.debug_rect = Rect{f32(x * TILE_SIZE * SECTOR_SIZE), f32(y * TILE_SIZE * SECTOR_SIZE), f32(TILE_SIZE * SECTOR_SIZE), f32(TILE_SIZE * SECTOR_SIZE)}
+        sector.debug_rect = Rect{f32(x * SECTOR_SIZE), f32(y * SECTOR_SIZE), f32(SECTOR_SIZE), f32(SECTOR_SIZE)}
 
         //
         // Neighbor sectors
@@ -385,19 +387,19 @@ draw_colliders :: proc()
 {
     for s in sectors
     {
-        raylib.DrawRectangleLinesEx(s.debug_rect, 1, {255, 128, 0, 255})
+        raylib.DrawRectangleLinesEx(s.debug_rect, ONE_PX_THICKNESS_SCALE, raylib.ORANGE)
     }
 
     for r in geo_colliders
     {
-        raylib.DrawRectangleLinesEx(r, 1, {0, 255, 0, 255})
+        raylib.DrawRectangleLinesEx(r, ONE_PX_THICKNESS_SCALE, raylib.GREEN)
     }
 
     for actor in actors
     {
         if actor == nil do continue
 
-        raylib.DrawCircleLines(i32(actor.position.x), i32(actor.position.y), actor.bp.radius, {0, 255, 0, 255})
-        raylib.DrawLineV(actor.position, actor.position + (angle_to_vector(actor.angle) * actor.bp.radius), raylib.GREEN)
+        draw_circle(actor.position, actor.bp.radius, ONE_PX_THICKNESS_SCALE, raylib.GREEN)
+        raylib.DrawLineEx(actor.position, actor.position + (angle_to_vector(actor.angle) * actor.bp.radius), ONE_PX_THICKNESS_SCALE, raylib.GREEN)
     }
 }

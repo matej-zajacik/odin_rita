@@ -5,7 +5,7 @@
             "flags": "DAMAGEABLE, MOBILE, PAWN, TARGETABLE",
             "speed": 5,
             "acceleration": 0.5,
-            "radius": 32,
+            "radius": 0.5,
             "mass": 1,
             "health": 100,
             "faction": "GOOD",
@@ -16,7 +16,7 @@
             "flags": "DAMAGEABLE, MOBILE, PAWN, TARGETABLE",
             "speed": 3.75,
             "acceleration": 0.5,
-            "radius": 24,
+            "radius": 0.375,
             "mass": 0.5,
             "health": 30,
             "faction": "EVIL"
