@@ -34,8 +34,10 @@ Gun :: struct
 {
     id:           Gun_Id,
     ammo_id:      Ammo_Id,
-    ammo_cost:    [2]int,
+    ammo_costs:   [2]int,
     attack_procs: [2]Attack_Proc,
+
+    unlocked:     bool,
 }
 
 
@@ -44,7 +46,7 @@ Player_Info :: struct
 {
     armor: int,
     guns:  [Gun_Id]Gun,
-    ammo:  [Gun_Id]int,
+    ammo:  [Ammo_Id]int,
 
     pending_gun_id: Gun_Id,
     current_gun:    ^Gun,
@@ -52,7 +54,7 @@ Player_Info :: struct
 
 
 
-player: ^Actor
+player:      ^Actor
 player_info: Player_Info
 
 
@@ -148,11 +150,11 @@ tick_player :: proc(player: ^Actor)
     // Do we want to fire the current gun?
     if queedo.get_input_action_down(int(Input_Action.USE_PRIMARY_ATTACK))
     {
-        use_current_gun(0)
+        try_use_current_gun(0)
     }
     else if queedo.get_input_action_down(int(Input_Action.USE_SECONDARY_ATTACK))
     {
-        use_current_gun(1)
+        try_use_current_gun(1)
     }
 
     if player.attack_proc != nil
@@ -166,28 +168,72 @@ tick_player :: proc(player: ^Actor)
 
 
 
-switch_gun :: proc(id: Gun_Id)
+try_switch_gun :: proc(id: Gun_Id) -> bool
 {
-    log.infof("player tries to switch to gun %v", id)
+    log.infof("switch_gun: trying to switch to gun %v", id)
 
     // If we're in the middle of an attack, we don't switch.
     if actor_is_attacking(player)
     {
-        log.infof("can't switch because we're currently attacking")
+        log.infof("try_switch_gun: can't switch because we're currently attacking")
+        return false
     }
 
     target_gun := &player_info.guns[id]
 
+    // If we don't have the gun... we ain't Copperfields.
+    if !target_gun.unlocked
+    {
+        log.infof("try_switch_gun: can't switch because we don't have that gun")
+        return false
+    }
+
     // If we already have the weapon, nothing to do here.
     if player_info.current_gun == target_gun
     {
-        log.infof("can't switch because we already have the gun equipped")
+        log.infof("try_switch_gun: can't switch because we already have that gun equipped")
+        return false
     }
 
-    player_info.current_gun = target_gun
-    player_info.pending_gun_id = .NONE
+    switch_gun(id)
+    return true
+}
 
-    log.infof("player switches to gun %v", id)
+
+
+switch_gun :: proc(id: Gun_Id)
+{
+    player_info.current_gun = &player_info.guns[id]
+    player_info.pending_gun_id = .NONE
+    log.infof("switch_gun: player switches to gun %v", id)
+}
+
+
+
+try_use_current_gun :: proc(attack_index: int) -> bool
+{
+    using player_info
+
+    if current_gun == nil do return false
+
+    if actor_is_attacking(player)
+    {
+        log.infof("try_use_current_gun: cannot use gun %v, as we are already attacking", current_gun.id)
+        return false
+    }
+
+    gun_id    := current_gun.id
+    ammo_id   := current_gun.ammo_id
+    ammo_cost := current_gun.ammo_costs[attack_index]
+
+    if ammo[ammo_id] < ammo_cost
+    {
+        log.infof("try_use_current_gun: gun %v requires %v %v ammo to fire, but we only have %v ammo", current_gun.id, ammo_cost, current_gun.ammo_id, ammo[ammo_id])
+        return false
+    }
+
+    use_current_gun(attack_index)
+    return true
 }
 
 
@@ -196,23 +242,7 @@ use_current_gun :: proc(attack_index: int)
 {
     using player_info
 
-    if current_gun == nil do return
-
-    if actor_is_attacking(player)
-    {
-        log.infof("cannot use gun %v, as we are already attacking", current_gun.id)
-        return
-    }
-
-    gun_id := current_gun.id
-    ammo_id := current_gun.ammo_id
-
-    if ammo[gun_id] < current_gun.ammo_cost[attack_index]
-    {
-        log.infof("gun %v requires %v %v ammo to fire, but we only have %v ammo", current_gun.id, current_gun.ammo_id, current_gun.ammo_cost[attack_index], ammo[gun_id])
-        return
-    }
-
+    ammo[current_gun.ammo_id] -= current_gun.ammo_costs[attack_index]
     start_attack(player, current_gun.attack_procs[attack_index])
 }
 

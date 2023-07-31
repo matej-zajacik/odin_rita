@@ -115,7 +115,6 @@ rotate_vector :: proc(v: ^Vector2, angle: f32)
 
 get_rotated_vector :: proc(v: Vector2, angle: f32) -> Vector2
 {
-    angle := math.to_radians(angle)
     sin := math.sin(angle)
     cos := math.cos(angle)
     return {v.x * cos - v.y * sin, v.x * sin + v.y * cos}
