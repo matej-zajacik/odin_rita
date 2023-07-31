@@ -24,8 +24,9 @@ Actor_Blueprint :: struct
     // Behavior
     //
 
-    health:  int,
-    faction: Faction,
+    health:    int,
+    faction:   Faction,
+    max_range: f32,
 
     // A proc to call when the actor is first constructed.
     make_proc: Actor_Proc,

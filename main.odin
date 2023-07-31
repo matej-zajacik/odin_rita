@@ -72,6 +72,7 @@ init_game :: proc()
 
     init_blueprints()
     init_actors()
+    init_guns()
 
     queedo.init_input_actions(len(Input_Action))
     queedo.register_input_action(int(Input_Action.MOVE_FORWARD),         .KEYBOARD_KEY, int(raylib.KeyboardKey.W))
@@ -104,31 +105,6 @@ tick_game :: proc(dt: f64)
 
     tick_actors()
     tick_camera()
-}
-
-
-
-draw_game :: proc()
-{
-    raylib.BeginMode2D(main_cam)
-    {
-        raylib.DrawTextureEx(map_tex, {}, 0.0, 1.0 / TILE_SIZE, raylib.WHITE)
-
-        for actor in actors
-        {
-            // We don't draw actors yet.
-            if actor == nil do continue
-        }
-
-        // We only draw debug colliders.
-        draw_colliders()
-    }
-    raylib.EndMode2D()
-
-    text := strings.clone_to_cstring(fmt.tprintf("ang: %v (%v°)", player.angle, math.to_degrees(player.angle)), context.temp_allocator)
-    raylib.DrawText(text, 8, 8, 16, raylib.WHITE)
-
-    raylib.DrawTexture(scanline_tex, 0, 0, raylib.WHITE)
 }
 
 

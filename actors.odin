@@ -12,13 +12,14 @@ import "shared:queedo"
 
 Actor_Proc  :: proc(actor: ^Actor)
 Attack_Proc :: proc(actor: ^Actor, phase: int) -> bool
-Impact_Proc :: proc(projectile: ^Actor, target: ^Actor, hit_point: Vector2, hit_normal: Vector2)
+Impact_Proc :: proc(proj: ^Actor, target: ^Actor, hit_point: Vector2, hit_normal: Vector2)
 
 
 
 Actor_Id :: enum
 {
     PLAYER,
+    PISTOL_PROJECTILE,
     SPIDERLING,
 }
 
@@ -26,10 +27,10 @@ Actor_Id :: enum
 
 Actor_Flag :: enum
 {
-    MOVED_THIS_FRAME,
     DAMAGEABLE,
     IN_PLAY,
     MOBILE,
+    MOVED_THIS_FRAME,
     PAWN,
     PROJECTILE,
     TARGETABLE,

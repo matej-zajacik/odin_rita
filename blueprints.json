@@ -9,7 +9,16 @@
             "mass": 1,
             "health": 100,
             "faction": "GOOD",
-            "default_proc": "tick_player"
+            "default_proc": "player_tick"
+        },
+        {
+            "id": "PISTOL_PROJECTILE",
+            "flags": "MOBILE, PROJECTILE",
+            "speed": 10,
+            "radius": 0.05,
+            "mass": 1,
+            "max_range": 8,
+            "impact_proc": "pistol_projectile_impact"
         },
         {
             "id": "SPIDERLING",

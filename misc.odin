@@ -125,7 +125,7 @@ get_rotated_vector :: proc(v: Vector2, angle: f32) -> Vector2
 
 vector_to_angle :: proc(v: Vector2) -> f32
 {
-    return get_wrapped_angle(math.atan2(v.y, v.x))
+    return get_wrapped_angle(math.atan2(-v.y, v.x))
 }
 
 
@@ -140,7 +140,6 @@ angle_to_vector :: proc(angle: f32) -> Vector2
 get_angle_between_angle_and_vector :: proc(angle: f32, vector: Vector2) -> f32
 {
     // log.infof("get_angle_between_angle_and_vector: %v vs %v", angle, vector_to_angle(vector))
-    // return math.abs(angle - vector_to_angle(vector))
     return math.angle_diff(angle, vector_to_angle(vector))
 }
 
@@ -174,9 +173,15 @@ rects_intersect :: proc(a: Rect, b: Rect) -> bool
 
 circle_intersects_rect :: proc(c: Circle, r: Rect) -> (hit: bool, depenetration: Vector2)
 {
-    // Find the closest point to the circle within the rectangle.
+    // Find the closest point to the rectangle.
     closest_x := math.clamp(c.x, get_rect_left(r), get_rect_right(r))
     closest_y := math.clamp(c.y, get_rect_top(r), get_rect_bottom(r))
+
+    // if closest is the same as circle pos, the circle's center is already inside the rect, so we then need to employ a different strategy...
+    if closest_x == c.x && closest_y == c.y
+    {
+        log.info("tunnel")
+    }
 
     // Calc the distance between the circle's center and the closest point.
     dist_x := c.x - closest_x

@@ -23,6 +23,7 @@ Actor_Blueprint_JSON :: struct
 
         health:           int,
         faction:          string,
+        max_range:        f32,
 
         make_proc:        string,
         spawn_proc:       string,
@@ -32,12 +33,12 @@ Actor_Blueprint_JSON :: struct
         sub_attack_procs: []string,
         death_proc:       string,
         impact_proc:      string,
-    }
+    },
 }
 
 
 
-BLUEPRINTS_JSON :: #load("blueprints.json")
+BLUEPRINTS_JSON :: #load("../blueprints.json")
 
 
 
@@ -65,7 +66,8 @@ main :: proc()
                 codegen.writef(cg, "radius           = %v,", item.radius)
                 codegen.writef(cg, "mass             = %v,", item.mass)
                 codegen.writef(cg, "health           = %v,", item.health)
-                codegen.writef(cg, "faction          = .%v,", item.faction)
+                codegen.writef(cg, "faction          = .%v,", item.faction == "" ? "NEUTRAL" : item.faction)
+                codegen.writef(cg, "max_range        = %v,", item.max_range)
                 codegen.writef(cg, "make_proc        = %v,", util.parse_proc(item.make_proc))
                 codegen.writef(cg, "spawn_proc       = %v,", util.parse_proc(item.spawn_proc))
                 codegen.writef(cg, "default_proc     = %v,", util.parse_proc(item.default_proc))

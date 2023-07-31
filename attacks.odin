@@ -68,6 +68,7 @@ get_attack_targets :: proc(ignored_actor: ^Actor, sector: ^Sector, position: Vec
             continue
         }
 
+        // log.infof("get_attack_targets: forward_angle %v, vec_to_target %v", forward_angle, vec_to_target)
         angle := get_angle_between_angle_and_vector(forward_angle, vec_to_target)
         log.infof("get_attack_targets: angle to %v is %v", target.id, angle)
 

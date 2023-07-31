@@ -59,14 +59,8 @@ player_info: Player_Info
 
 
 
-spawn_player :: proc(position: Vector2, angle: f32)
+init_guns :: proc()
 {
-    player = spawn_actor(.PLAYER, position, angle)
-
-    //
-    // Guns
-    //
-
     gun: ^Gun
 
     gun                 = &player_info.guns[.WRENCH]
@@ -82,7 +76,14 @@ spawn_player :: proc(position: Vector2, angle: f32)
 
 
 
-tick_player :: proc(player: ^Actor)
+spawn_player :: proc(position: Vector2, angle: f32)
+{
+    player = spawn_actor(.PLAYER, position, angle)
+}
+
+
+
+player_tick :: proc(player: ^Actor)
 {
     //
     // Angle
@@ -144,13 +145,15 @@ tick_player :: proc(player: ^Actor)
     // Did we request a gun switch?
     if player_info.pending_gun_id > .NONE
     {
-        switch_gun(player_info.pending_gun_id)
+        // try_switch_gun(player_info.pending_gun_id)
+        switch_gun(player_info.pending_gun_id) // CHEAT
     }
 
     // Do we want to fire the current gun?
     if queedo.get_input_action_down(int(Input_Action.USE_PRIMARY_ATTACK))
     {
-        try_use_current_gun(0)
+        // try_use_current_gun(0)
+        use_current_gun(0) // CHEAT
     }
     else if queedo.get_input_action_down(int(Input_Action.USE_SECONDARY_ATTACK))
     {
@@ -185,6 +188,7 @@ try_switch_gun :: proc(id: Gun_Id) -> bool
     if !target_gun.unlocked
     {
         log.infof("try_switch_gun: can't switch because we don't have that gun")
+        player_info.pending_gun_id = .NONE
         return false
     }
 
@@ -192,6 +196,7 @@ try_switch_gun :: proc(id: Gun_Id) -> bool
     if player_info.current_gun == target_gun
     {
         log.infof("try_switch_gun: can't switch because we already have that gun equipped")
+        player_info.pending_gun_id = .NONE
         return false
     }
 
@@ -261,7 +266,7 @@ wrench_attack :: proc(player: ^Actor, phase: int) -> bool
 
         case 1:
             log.infof("wrench_attack: damage point")
-            target := get_closest_target_for_melee_attack(player, 80, 45)
+            target := get_closest_target_for_melee_attack(player, 1.5, math.to_radians_f32(45))
             if target != nil
             {
                 log.infof("damage this dude %v", target.id)
@@ -281,5 +286,18 @@ wrench_attack :: proc(player: ^Actor, phase: int) -> bool
 
 pistol_attack :: proc(player: ^Actor, phase: int) -> bool
 {
+    player.attack_timer -= 1
+    if player.attack_timer > 0 do return true
+
+    switch phase
+    {
+        case 0:
+            spawn_projectile(player, .PISTOL_PROJECTILE, player.position + angle_to_vector(player.angle) * 0.6, player.angle)
+            advance_attack(player, 30)
+
+        case 1:
+            return false
+    }
+
     return true
 }
