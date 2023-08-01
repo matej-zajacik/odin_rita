@@ -38,14 +38,12 @@ Actor_Blueprint_JSON :: struct
 
 
 
-BLUEPRINTS_JSON :: #load("../blueprints.json")
-
-
-
 main :: proc()
 {
+    util.set_file_current_dir(#file)
+
     src: Actor_Blueprint_JSON
-    util.read_json_bytes_to_obj(BLUEPRINTS_JSON, &src)
+    util.read_json_file_to_obj("../blueprints.json", &src)
 
     cg := codegen.make_codegen()
     defer codegen.free_codegen(cg)
@@ -97,5 +95,5 @@ main :: proc()
 
     // fmt.println(codegen.to_string(cg))
 
-    os.write_entire_file("generated.odin", codegen.to_bytes(cg))
+    os.write_entire_file("../generated.odin", codegen.to_bytes(cg))
 }

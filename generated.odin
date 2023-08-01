@@ -28,9 +28,9 @@ load_blueprints :: proc()
     {
         id               = .PISTOL_PROJECTILE,
         flags            = {.MOBILE, .PROJECTILE},
-        speed            = 10.000,
+        speed            = 12.000,
         acceleration     = 0.000,
-        radius           = 0.050,
+        radius           = 0.100,
         mass             = 1.000,
         health           = 0,
         faction          = .NEUTRAL,

@@ -12,57 +12,26 @@ import "shared:queedo"
 
 move_actors :: proc(mobile_actors: [dynamic]^Actor)
 {
-    //
-    // Actors vs actors
-    //
-
     for actor in mobile_actors
     {
-        if actor.speed == {} && .MOVED_THIS_FRAME not_in actor.flags
+        if actor.speed == {}
         {
             continue
         }
 
-        move_actor(actor, actor.speed)
+        to_move := actor.speed
+        iterations := 0
 
-        for other in actor.sector.actors
+        for to_move != {}
         {
-            if other == actor do continue
-
-            other_to_actor_vec := actor.position - other.position
-            dist := linalg.length(other_to_actor_vec)
-            radii := actor.bp.radius + other.bp.radius
-
-            if dist < radii
-            {
-                dir := linalg.normalize(other_to_actor_vec)
-                move_actor(actor, dir * (radii - dist))
-            }
+            iterations += 1
+            step := clamp_vector_length(to_move, actor.bp.radius - 0.001)
+            move_actor(actor, step)
+            to_move -= step
         }
+
+        // log.infof("move_actors: %v did %v iterations", actor.id, iterations)
     }
-
-    //
-    // Actors vs geometry
-    //
-
-    // We test against geometry only after all actor-vs-actor tests are done, because geometry has higher priority (must be solid and cannot be moved through).
-
-    for actor in mobile_actors
-    {
-        c := Circle{actor.position.x, actor.position.y, actor.bp.radius}
-
-        for rect in actor.sector.geo_colliders
-        {
-            if hit, dep := circle_intersects_rect(c, rect^); hit
-            {
-                move_actor(actor, dep)
-
-                if dep.x != 0.0 do actor.speed.x = 0.0
-                if dep.y != 0.0 do actor.speed.y = 0.0
-            }
-        }
-    }
-
 
     //
     // Update sectors
@@ -85,7 +54,124 @@ move_actor :: proc(actor: ^Actor, delta: Vector2)
 
     actor.position += delta
     actor.flags += {.MOVED_THIS_FRAME}
+
+    //
+    // Actor vs actors
+    //
+
+    for other in actor.sector.actors
+    {
+        if other == actor do continue
+
+        other_to_actor_vec := actor.position - other.position
+        dist := linalg.length(other_to_actor_vec)
+        radii := actor.bp.radius + other.bp.radius
+
+        if dist < radii
+        {
+            dir := linalg.normalize(other_to_actor_vec)
+            // move_actor(actor, dir * (radii - dist))
+            actor.position += dir * (radii - dist)
+        }
+    }
+
+    //
+    // Actor vs geometry
+    //
+
+    c := Circle{actor.position.x, actor.position.y, actor.bp.radius}
+
+    for rect in actor.sector.geo_colliders
+    {
+        if hit, dep := test_circle_vs_rect(c, rect^); hit
+        {
+            // move_actor(actor, dep)
+            actor.position += dep
+
+            if dep.x != 0.0 do actor.speed.x = 0.0
+            if dep.y != 0.0 do actor.speed.y = 0.0
+        }
+    }
 }
+
+
+
+// move_actors :: proc(mobile_actors: [dynamic]^Actor)
+// {
+//     //
+//     // Actors vs actors
+//     //
+
+//     for actor in mobile_actors
+//     {
+//         if actor.speed == {} && .MOVED_THIS_FRAME not_in actor.flags
+//         {
+//             continue
+//         }
+
+//         move_actor(actor, actor.speed)
+
+//         for other in actor.sector.actors
+//         {
+//             if other == actor do continue
+
+//             other_to_actor_vec := actor.position - other.position
+//             dist := linalg.length(other_to_actor_vec)
+//             radii := actor.bp.radius + other.bp.radius
+
+//             if dist < radii
+//             {
+//                 dir := linalg.normalize(other_to_actor_vec)
+//                 move_actor(actor, dir * (radii - dist))
+//             }
+//         }
+//     }
+
+//     //
+//     // Actors vs geometry
+//     //
+
+//     // We test against geometry only after all actor-vs-actor tests are done, because geometry has higher priority (must be solid and cannot be moved through).
+
+//     for actor in mobile_actors
+//     {
+//         c := Circle{actor.position.x, actor.position.y, actor.bp.radius}
+
+//         for rect in actor.sector.geo_colliders
+//         {
+//             if hit, dep := test_circle_vs_rect(c, rect^); hit
+//             {
+//                 move_actor(actor, dep)
+
+//                 if dep.x != 0.0 do actor.speed.x = 0.0
+//                 if dep.y != 0.0 do actor.speed.y = 0.0
+//             }
+//         }
+//     }
+
+
+//     //
+//     // Update sectors
+//     //
+
+//     for actor in mobile_actors
+//     {
+//         if .MOVED_THIS_FRAME not_in actor.flags do continue
+
+//         update_actor_sector(actor)
+//         actor.flags -= {.MOVED_THIS_FRAME}
+//     }
+// }
+
+
+
+// move_actor :: proc(actor: ^Actor, delta: Vector2)
+// {
+//     if delta == {} do return
+
+//     actor.position += delta
+//     actor.flags += {.MOVED_THIS_FRAME}
+// }
 
 
 
@@ -198,4 +284,41 @@ update_actor_speed :: proc(actor: ^Actor)
 
     // Now finally compute the new speed.
     actor.speed = move_towards(speed, target_speed, actor.bp.acceleration * acceleration_mult)
+}
+
+
+
+test_circle_vs_rect :: proc(c: Circle, r: Rect) -> (hit: bool, depenetration: Vector2)
+{
+    // Find the closest point to the rectangle.
+    closest_x := math.clamp(c.x, get_rect_left(r), get_rect_right(r))
+    closest_y := math.clamp(c.y, get_rect_top(r), get_rect_bottom(r))
+
+    if closest_x == c.x && closest_y == c.y
+    {
+        log.errorf("test_circle_vs_rect: %v tunneled through %v", c, r)
+    }
+
+    // Calc the distance between the circle's center and the closest point.
+    dist_x := c.x - closest_x
+    dist_y := c.y - closest_y
+    dist_sq := dist_x * dist_x + dist_y * dist_y
+
+    // If the distance is less than the circle's radius, we have an intersection.
+    hit = dist_sq < c.r * c.r
+
+    if hit
+    {
+        if dist_x != 0.0
+        {
+            depenetration.x = (c.r - math.abs(dist_x)) * math.sign(dist_x)
+        }
+
+        if dist_y != 0.0
+        {
+            depenetration.y = (c.r - math.abs(dist_y)) * math.sign(dist_y)
+        }
+    }
+
+    return
 }

@@ -102,6 +102,20 @@ move_towards :: proc
 
 
 
+clamp_vector_length :: proc(v: Vector2, max_length: f32) -> Vector2
+{
+    length := linalg.length(v)
+
+    if length <= max_length
+    {
+        return v
+    }
+
+    return v * (max_length / length)
+}
+
+
+
 rotate_vector :: proc(v: ^Vector2, angle: f32)
 {
     sin := math.sin(angle)
@@ -167,44 +181,6 @@ rects_intersect :: proc(a: Rect, b: Rect) -> bool
            get_rect_left(b) < get_rect_right(a) &&
            get_rect_top(a) < get_rect_bottom(b) &&
            get_rect_top(b) < get_rect_bottom(a)
-}
-
-
-
-circle_intersects_rect :: proc(c: Circle, r: Rect) -> (hit: bool, depenetration: Vector2)
-{
-    // Find the closest point to the rectangle.
-    closest_x := math.clamp(c.x, get_rect_left(r), get_rect_right(r))
-    closest_y := math.clamp(c.y, get_rect_top(r), get_rect_bottom(r))
-
-    // if closest is the same as circle pos, the circle's center is already inside the rect, so we then need to employ a different strategy...
-    if closest_x == c.x && closest_y == c.y
-    {
-        log.info("tunnel")
-    }
-
-    // Calc the distance between the circle's center and the closest point.
-    dist_x := c.x - closest_x
-    dist_y := c.y - closest_y
-    dist_sq := dist_x * dist_x + dist_y * dist_y
-
-    // If the distance is less than the circle's radius, we have an intersection.
-    hit = dist_sq < c.r * c.r
-
-    if hit
-    {
-        if dist_x != 0.0
-        {
-            depenetration.x = (c.r - math.abs(dist_x)) * math.sign(dist_x)
-        }
-
-        if dist_y != 0.0
-        {
-            depenetration.y = (c.r - math.abs(dist_y)) * math.sign(dist_y)
-        }
-    }
-
-    return
 }
 
 

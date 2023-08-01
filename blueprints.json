@@ -14,8 +14,8 @@
         {
             "id": "PISTOL_PROJECTILE",
             "flags": "MOBILE, PROJECTILE",
-            "speed": 10,
-            "radius": 0.05,
+            "speed": 12,
+            "radius": 0.1,
             "mass": 1,
             "max_range": 8,
             "impact_proc": "pistol_projectile_impact"

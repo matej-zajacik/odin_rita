@@ -395,9 +395,9 @@ draw_colliders :: proc()
         raylib.DrawRectangleLinesEx(r, ONE_PX_THICKNESS_SCALE, raylib.GREEN)
     }
 
-    for actor in actors
+    for &actor in actors
     {
-        if actor == nil do continue
+        if !actor_is_in_play(&actor) do continue
 
         draw_circle(actor.position, actor.bp.radius, ONE_PX_THICKNESS_SCALE, raylib.GREEN)
         raylib.DrawLineEx(actor.position, actor.position + (angle_to_vector(actor.angle) * actor.bp.radius), ONE_PX_THICKNESS_SCALE, raylib.GREEN)

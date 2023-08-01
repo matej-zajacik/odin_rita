@@ -40,10 +40,10 @@ draw_game :: proc()
     {
         raylib.DrawTextureEx(map_tex, {}, 0.0, 1.0 / TILE_SIZE, raylib.WHITE)
 
-        for actor in actors
+        for &actor in actors
         {
             // We don't draw actors yet.
-            if actor == nil do continue
+            if !actor_is_in_play(&actor) do continue
         }
 
         // We only draw debug colliders.
