@@ -400,6 +400,6 @@ draw_colliders :: proc()
         if !actor_is_in_play(&actor) do continue
 
         draw_circle(actor.position, actor.bp.radius, ONE_PX_THICKNESS_SCALE, raylib.GREEN)
-        raylib.DrawLineEx(actor.position, actor.position + (angle_to_vector(actor.angle) * actor.bp.radius), ONE_PX_THICKNESS_SCALE, raylib.GREEN)
+        raylib.DrawLineEx(actor.position, actor.position + get_actor_forward(&actor) * actor.bp.radius, ONE_PX_THICKNESS_SCALE, raylib.GREEN)
     }
 }

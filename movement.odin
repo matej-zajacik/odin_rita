@@ -10,6 +10,30 @@ import "shared:queedo"
 
 
 
+// Should be called when the actor's position is supposed to suddenly change (when spawned, teleported, and such).
+// Standard movement code doesn't call this.
+set_actor_position :: proc(actor: ^Actor, position: Vector2)
+{
+    actor.position = position
+    update_actor_sector(actor)
+}
+
+
+
+set_actor_angle :: proc(actor: ^Actor, angle: f32)
+{
+    actor.angle = get_wrapped_angle(angle)
+}
+
+
+
+get_actor_forward :: proc(actor: ^Actor) -> Vector2
+{
+    return angle_to_vector(actor.angle)
+}
+
+
+
 move_actors :: proc(mobile_actors: [dynamic]^Actor)
 {
     for actor in mobile_actors
@@ -92,102 +116,6 @@ move_actor :: proc(actor: ^Actor, delta: Vector2)
             if dep.y != 0.0 do actor.speed.y = 0.0
         }
     }
-}
-
-
-
-// move_actors :: proc(mobile_actors: [dynamic]^Actor)
-// {
-//     //
-//     // Actors vs actors
-//     //
-
-//     for actor in mobile_actors
-//     {
-//         if actor.speed == {} && .MOVED_THIS_FRAME not_in actor.flags
-//         {
-//             continue
-//         }
-
-//         move_actor(actor, actor.speed)
-
-//         for other in actor.sector.actors
-//         {
-//             if other == actor do continue
-
-//             other_to_actor_vec := actor.position - other.position
-//             dist := linalg.length(other_to_actor_vec)
-//             radii := actor.bp.radius + other.bp.radius
-
-//             if dist < radii
-//             {
-//                 dir := linalg.normalize(other_to_actor_vec)
-//                 move_actor(actor, dir * (radii - dist))
-//             }
-//         }
-//     }
-
-//     //
-//     // Actors vs geometry
-//     //
-
-//     // We test against geometry only after all actor-vs-actor tests are done, because geometry has higher priority (must be solid and cannot be moved through).
-
-//     for actor in mobile_actors
-//     {
-//         c := Circle{actor.position.x, actor.position.y, actor.bp.radius}
-
-//         for rect in actor.sector.geo_colliders
-//         {
-//             if hit, dep := test_circle_vs_rect(c, rect^); hit
-//             {
-//                 move_actor(actor, dep)
-
-//                 if dep.x != 0.0 do actor.speed.x = 0.0
-//                 if dep.y != 0.0 do actor.speed.y = 0.0
-//             }
-//         }
-//     }
-
-
-//     //
-//     // Update sectors
-//     //
-
-//     for actor in mobile_actors
-//     {
-//         if .MOVED_THIS_FRAME not_in actor.flags do continue
-
-//         update_actor_sector(actor)
-//         actor.flags -= {.MOVED_THIS_FRAME}
-//     }
-// }
-
-
-
-// move_actor :: proc(actor: ^Actor, delta: Vector2)
-// {
-//     if delta == {} do return
-
-//     actor.position += delta
-//     actor.flags += {.MOVED_THIS_FRAME}
-// }
-
-
-
-// Should be called when the actor's position is supposed to suddenly change (when spawned, teleported, and such).
-// Standard movement code doesn't call this.
-set_actor_position :: proc(actor: ^Actor, position: Vector2)
-{
-    actor.position = position
-    update_actor_sector(actor)
-}
-
-
-
-set_actor_angle :: proc(actor: ^Actor, angle: f32)
-{
-    actor.angle = get_wrapped_angle(angle)
 }
 
 

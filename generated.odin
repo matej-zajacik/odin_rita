@@ -57,7 +57,7 @@ load_blueprints :: proc()
         max_range        = 0.000,
         make_proc        = nil,
         spawn_proc       = nil,
-        default_proc     = nil,
+        default_proc     = spiderling_tick,
         chase_proc       = nil,
         attack_proc      = nil,
         sub_attack_procs = nil,

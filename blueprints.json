@@ -28,7 +28,8 @@
             "radius": 0.375,
             "mass": 0.5,
             "health": 30,
-            "faction": "EVIL"
+            "faction": "EVIL",
+            "default_proc": "spiderling_tick"
         }
     ]
 }

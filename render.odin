@@ -4,6 +4,7 @@ import "core:fmt"
 import "core:math"
 import "core:strings"
 import "vendor:raylib"
+import "shared:queedo"
 
 
 
@@ -48,6 +49,8 @@ draw_game :: proc()
 
         // We only draw debug colliders.
         draw_colliders()
+
+        queedo.draw_debug_shapes()
     }
     raylib.EndMode2D()
 

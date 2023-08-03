@@ -4,6 +4,7 @@ import "core:fmt"
 import "core:log"
 import "core:math"
 import "core:math/linalg"
+import "core:math/rand"
 import "core:os"
 import "core:runtime"
 import "core:strings"
@@ -118,4 +119,17 @@ quit_game :: proc()
 test :: proc()
 {
     spawn_actor(.SPIDERLING, {5, 5}, 0)
+}
+
+
+
+spiderling_tick :: proc(actor: ^Actor)
+{
+    actor.tick_timer -= 1
+
+    if actor.tick_timer > 0 do return
+
+    actor.desired_dir = angle_to_vector(rand.float32_range(0, math.TAU))
+    actor.tick_timer = 45
+    queedo.draw_debug_line(actor.position, actor.position + actor.desired_dir, ONE_PX_THICKNESS_SCALE, raylib.YELLOW, 45)
 }

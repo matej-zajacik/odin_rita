@@ -292,7 +292,7 @@ pistol_attack :: proc(player: ^Actor, phase: int) -> bool
     switch phase
     {
         case 0:
-            spawn_projectile(player, .PISTOL_PROJECTILE, player.position + angle_to_vector(player.angle) * 0.6, player.angle)
+            spawn_projectile(player, .PISTOL_PROJECTILE, player.position + get_actor_forward(player) * 0.6, player.angle)
             advance_attack(player, 30)
 
         case 1:

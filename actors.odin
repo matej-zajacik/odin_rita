@@ -236,7 +236,7 @@ tick_actors :: proc()
         }
 
         // If our target is out of play, we need to remove it.
-        if actor.target != nil && .IN_PLAY not_in actor.target.flags
+        if actor.target != nil && !actor_is_in_play(actor.target)
         {
             actor.target = nil
         }
