@@ -6,10 +6,11 @@ Top-down shooter written in Odin &amp; Raylib.
 
 - [ ] Implement projectiles:
     - [ ] Impact functionality.
+    - [ ] Projectile collision.
     - [x] Change actor move code to prevent tunneling.
     - [x] Pistol projectile attack for starters.
 - [ ] Make a particle system.
-- [ ] Add debug drawing stuff to Queedo lib.
+- [x] Add debug drawing stuff to Queedo lib.
 - [x] Rework `actors` from `[]^Actor` to `[]Actor`. Simply have a fixed array of values instead of pointers of heap-allocated actors, so iteration is faster, and we can also completely ditch the whole pooling shabang.
 - [x] Add a "scan-line" screen effect.
 - [x] Change world units to 1 unit = 1 tile.

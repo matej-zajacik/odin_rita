@@ -372,7 +372,7 @@ init_sectors :: proc()
 
 
 
-get_sector :: proc(x: int, y: int) -> ^Sector
+get_sector :: #force_inline proc(x: int, y: int) -> ^Sector
 {
     return &sectors[y * sector_cols + x]
 }

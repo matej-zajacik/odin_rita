@@ -241,6 +241,12 @@ tick_actors :: proc()
             actor.target = nil
         }
 
+        // The same goes for our owner.
+        if actor.owner != nil && !actor_is_in_play(actor.owner)
+        {
+            actor.owner = nil
+        }
+
         // Is this our hour of doom?
         if actor.removal_frame == current_frame
         {

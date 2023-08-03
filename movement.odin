@@ -38,10 +38,7 @@ move_actors :: proc(mobile_actors: [dynamic]^Actor)
 {
     for actor in mobile_actors
     {
-        if actor.speed == {}
-        {
-            continue
-        }
+        if actor.speed == {} do continue
 
         to_move := actor.speed
         iterations := 0
@@ -50,7 +47,7 @@ move_actors :: proc(mobile_actors: [dynamic]^Actor)
         {
             iterations += 1
             step := clamp_vector_length(to_move, actor.bp.radius - 0.001)
-            move_actor(actor, step)
+            if !move_actor(actor, step) do break;
             to_move -= step
         }
 
@@ -72,10 +69,8 @@ move_actors :: proc(mobile_actors: [dynamic]^Actor)
 
 
 
-move_actor :: proc(actor: ^Actor, delta: Vector2)
+move_actor :: proc(actor: ^Actor, delta: Vector2) -> bool
 {
-    if delta == {} do return
-
     actor.position += delta
     actor.flags += {.MOVED_THIS_FRAME}
 
@@ -116,6 +111,8 @@ move_actor :: proc(actor: ^Actor, delta: Vector2)
             if dep.y != 0.0 do actor.speed.y = 0.0
         }
     }
+
+    return true
 }
 
 
