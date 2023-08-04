@@ -14,7 +14,7 @@
         {
             "id": "PISTOL_PROJECTILE",
             "flags": "MOBILE, PROJECTILE",
-            "speed": 12,
+            "speed": 15,
             "radius": 0.1,
             "mass": 1,
             "max_range": 8,

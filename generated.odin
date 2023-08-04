@@ -28,7 +28,7 @@ load_blueprints :: proc()
     {
         id               = .PISTOL_PROJECTILE,
         flags            = {.MOBILE, .PROJECTILE},
-        speed            = 12.000,
+        speed            = 15.000,
         acceleration     = 0.000,
         radius           = 0.100,
         mass             = 1.000,

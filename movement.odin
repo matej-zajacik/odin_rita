@@ -82,15 +82,21 @@ move_actor :: proc(actor: ^Actor, delta: Vector2) -> bool
     {
         if other == actor do continue
 
-        other_to_actor_vec := actor.position - other.position
-        dist := linalg.length(other_to_actor_vec)
+        vec_to_other := other.position - actor.position
+        dist := linalg.length(vec_to_other)
         radii := actor.bp.radius + other.bp.radius
 
         if dist < radii
         {
-            dir := linalg.normalize(other_to_actor_vec)
-            // move_actor(actor, dir * (radii - dist))
-            actor.position += dir * (radii - dist)
+            dir := linalg.normalize(vec_to_other)
+
+            if .PROJECTILE in actor.flags
+            {
+                projectile_did_hit_actor(actor, other, actor.position + dir * actor.bp.radius, -dir)
+                return false
+            }
+
+            actor.position -= dir * (radii - dist)
         }
     }
 
@@ -104,7 +110,13 @@ move_actor :: proc(actor: ^Actor, delta: Vector2) -> bool
     {
         if hit, dep := test_circle_vs_rect(c, rect^); hit
         {
-            // move_actor(actor, dep)
+            if .PROJECTILE in actor.flags
+            {
+                normal := linalg.normalize(dep)
+                projectile_did_hit_actor(actor, nil, actor.position + dep - normal * actor.bp.radius, normal)
+                return false
+            }
+
             actor.position += dep
 
             if dep.x != 0.0 do actor.speed.x = 0.0

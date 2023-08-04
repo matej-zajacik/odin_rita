@@ -129,15 +129,15 @@ player_tick :: proc(player: ^Actor)
     // Guns
     //
 
-    if queedo.get_input_action_down(int(Input_Action.SELECT_GUN_WRENCH))
+    if queedo.get_input_action_down(int(Input_Action.SELECT_WRENCH))
     {
         player_info.pending_gun_id = .WRENCH
     }
-    else if queedo.get_input_action_down(int(Input_Action.SELECT_GUN_PISTOL))
+    else if queedo.get_input_action_down(int(Input_Action.SELECT_PISTOL))
     {
         player_info.pending_gun_id = .PISTOL
     }
-    else if queedo.get_input_action_down(int(Input_Action.SELECT_GUN_SHOTGUN))
+    else if queedo.get_input_action_down(int(Input_Action.SELECT_SHOTGUN))
     {
         player_info.pending_gun_id = .SHOTGUN
     }
@@ -150,12 +150,11 @@ player_tick :: proc(player: ^Actor)
     }
 
     // Do we want to fire the current gun?
-    if queedo.get_input_action_down(int(Input_Action.USE_PRIMARY_ATTACK))
+    if queedo.get_input_action(int(Input_Action.USE_PRIMARY_ATTACK))
     {
-        // try_use_current_gun(0)
-        use_current_gun(0) // CHEAT
+        try_use_current_gun(0)
     }
-    else if queedo.get_input_action_down(int(Input_Action.USE_SECONDARY_ATTACK))
+    else if queedo.get_input_action(int(Input_Action.USE_SECONDARY_ATTACK))
     {
         try_use_current_gun(1)
     }
@@ -173,7 +172,7 @@ player_tick :: proc(player: ^Actor)
 
 try_switch_gun :: proc(id: Gun_Id) -> bool
 {
-    log.infof("switch_gun: trying to switch to gun %v", id)
+    log.infof("try_switch_gun: trying to switch to gun %v", id)
 
     // If we're in the middle of an attack, we don't switch.
     if actor_is_attacking(player)
@@ -231,9 +230,9 @@ try_use_current_gun :: proc(attack_index: int) -> bool
     ammo_id   := current_gun.ammo_id
     ammo_cost := current_gun.ammo_costs[attack_index]
 
-    if ammo[ammo_id] < ammo_cost
+    if !cheats[.UNLIMITED_AMMO] && ammo[ammo_id] < ammo_cost
     {
-        log.infof("try_use_current_gun: gun %v requires %v %v ammo to fire, but we only have %v ammo", current_gun.id, ammo_cost, current_gun.ammo_id, ammo[ammo_id])
+        log.infof("try_use_current_gun: gun %v requires %v %v ammo to fire, but we only have %v ammo", gun_id, ammo_cost, ammo_id, ammo[ammo_id])
         return false
     }
 
@@ -300,4 +299,10 @@ pistol_attack :: proc(player: ^Actor, phase: int) -> bool
     }
 
     return true
+}
+
+
+
+pistol_projectile_impact :: proc(proj: ^Actor, target: ^Actor, hit_point: Vector2, hit_normal: Vector2)
+{
 }

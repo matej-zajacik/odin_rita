@@ -157,7 +157,7 @@ spawn_actor :: proc(id: Actor_Id, position: Vector2, angle: f32) -> ^Actor
     actor.spawn_frame = current_frame
 
     // Make sure the game doesn't remove the actor automatically later on (unless told to specifically somewhere down the line).
-    actor.removal_frame = -100 // @TODO: How to get something like I64_MIN or INT_MIN in Odin?
+    actor.removal_frame = -1
 
     //
     // Movement & physics

@@ -19,7 +19,7 @@ init_scanline_fx :: proc()
 
     scanline_img := raylib.GenImageColor(w, h, {})
 
-    for i in 0..<900
+    for i in 0..<h
     {
         if i & 2 == 0
         {
@@ -43,8 +43,9 @@ draw_game :: proc()
 
         for &actor in actors
         {
-            // We don't draw actors yet.
             if !actor_is_in_play(&actor) do continue
+
+            // We don't draw actors yet.
         }
 
         // We only draw debug colliders.

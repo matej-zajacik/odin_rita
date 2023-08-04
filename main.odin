@@ -13,9 +13,10 @@ import "shared:queedo"
 
 
 
-Vector2 :: raylib.Vector2
-Rect    :: raylib.Rectangle
 Color   :: raylib.Color
+Rect    :: raylib.Rectangle
+Sound   :: raylib.Sound
+Vector2 :: raylib.Vector2
 
 
 
@@ -26,11 +27,11 @@ Input_Action :: enum
     MOVE_LEFT,
     MOVE_RIGHT,
 
-    SELECT_GUN_WRENCH,
-    SELECT_GUN_PISTOL,
-    SELECT_GUN_SHOTGUN,
-    SELECT_GUN_RIFLE,
-    SELECT_GUN_GATLING,
+    SELECT_WRENCH,
+    SELECT_PISTOL,
+    SELECT_SHOTGUN,
+    SELECT_RIFLE,
+    SELECT_GATLING,
 
     USE_PRIMARY_ATTACK,
     USE_SECONDARY_ATTACK,
@@ -80,11 +81,11 @@ init_game :: proc()
     queedo.register_input_action(int(Input_Action.MOVE_BACKWARD),        .KEYBOARD_KEY, int(raylib.KeyboardKey.S))
     queedo.register_input_action(int(Input_Action.MOVE_LEFT),            .KEYBOARD_KEY, int(raylib.KeyboardKey.A))
     queedo.register_input_action(int(Input_Action.MOVE_RIGHT),           .KEYBOARD_KEY, int(raylib.KeyboardKey.D))
-    queedo.register_input_action(int(Input_Action.SELECT_GUN_WRENCH),    .KEYBOARD_KEY, int(raylib.KeyboardKey.ONE))
-    queedo.register_input_action(int(Input_Action.SELECT_GUN_PISTOL),    .KEYBOARD_KEY, int(raylib.KeyboardKey.TWO))
-    queedo.register_input_action(int(Input_Action.SELECT_GUN_SHOTGUN),   .KEYBOARD_KEY, int(raylib.KeyboardKey.THREE))
-    queedo.register_input_action(int(Input_Action.SELECT_GUN_RIFLE),     .KEYBOARD_KEY, int(raylib.KeyboardKey.FOUR))
-    queedo.register_input_action(int(Input_Action.SELECT_GUN_GATLING),   .KEYBOARD_KEY, int(raylib.KeyboardKey.FIVE))
+    queedo.register_input_action(int(Input_Action.SELECT_WRENCH),        .KEYBOARD_KEY, int(raylib.KeyboardKey.ONE))
+    queedo.register_input_action(int(Input_Action.SELECT_PISTOL),        .KEYBOARD_KEY, int(raylib.KeyboardKey.TWO))
+    queedo.register_input_action(int(Input_Action.SELECT_SHOTGUN),       .KEYBOARD_KEY, int(raylib.KeyboardKey.THREE))
+    queedo.register_input_action(int(Input_Action.SELECT_RIFLE),         .KEYBOARD_KEY, int(raylib.KeyboardKey.FOUR))
+    queedo.register_input_action(int(Input_Action.SELECT_GATLING),       .KEYBOARD_KEY, int(raylib.KeyboardKey.FIVE))
     queedo.register_input_action(int(Input_Action.USE_PRIMARY_ATTACK),   .MOUSE_BUTTON, 0)
     queedo.register_input_action(int(Input_Action.USE_SECONDARY_ATTACK), .MOUSE_BUTTON, 1)
 
@@ -119,6 +120,7 @@ quit_game :: proc()
 test :: proc()
 {
     spawn_actor(.SPIDERLING, {5, 5}, 0)
+    toggle_cheat(.UNLIMITED_AMMO)
 }
 
 

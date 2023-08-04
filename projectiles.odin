@@ -30,6 +30,14 @@ spawn_projectile :: proc(source: ^Actor, id: Actor_Id, position: Vector2, angle:
 
 
 
-pistol_projectile_impact :: proc(proj: ^Actor, target: ^Actor, hit_point: Vector2, hit_normal: Vector2)
+projectile_did_hit_actor :: proc(proj: ^Actor, target: ^Actor, point: Vector2, normal: Vector2)
 {
+    queedo.draw_debug_line(point, point + normal, ONE_PX_THICKNESS_SCALE, raylib.GREEN, 60)
+
+    if proj.bp.impact_proc != nil
+    {
+        proj.bp.impact_proc(proj, target, point, normal)
+    }
+
+    remove_actor(proj)
 }
