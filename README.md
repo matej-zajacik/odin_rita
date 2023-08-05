@@ -4,7 +4,7 @@ Top-down shooter written in Odin &amp; Raylib.
 
 # To Do
 
-- [ ] Get rid of Queedo lib. Just inline everything into the project so it's more flexible and we don't need to jump around projects.
+- [x] Get rid of Queedo lib. Just inline everything into the project so it's more flexible and we don't need to jump around projects.
 - [x] Implement projectiles:
     - [x] Impact functionality.
     - [x] Projectile collision.

@@ -6,7 +6,6 @@ import "core:math"
 import "core:math/linalg"
 import "core:slice"
 import "vendor:raylib"
-import "shared:queedo"
 
 
 

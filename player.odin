@@ -5,7 +5,6 @@ import "core:math"
 import "core:math/linalg"
 import "core:log"
 import "core:slice"
-import "shared:queedo"
 
 
 
@@ -98,19 +97,19 @@ player_tick :: proc(player: ^Actor)
 
     desired_dir: Vector2
 
-    if queedo.get_input_action(int(Input_Action.MOVE_FORWARD))
+    if get_input_action(.MOVE_FORWARD)
     {
         desired_dir.y -= 1
     }
-    if queedo.get_input_action(int(Input_Action.MOVE_BACKWARD))
+    if get_input_action(.MOVE_BACKWARD)
     {
         desired_dir.y += 1
     }
-    if queedo.get_input_action(int(Input_Action.MOVE_LEFT))
+    if get_input_action(.MOVE_LEFT)
     {
         desired_dir.x -= 1
     }
-    if queedo.get_input_action(int(Input_Action.MOVE_RIGHT))
+    if get_input_action(.MOVE_RIGHT)
     {
         desired_dir.x += 1
     }
@@ -129,15 +128,15 @@ player_tick :: proc(player: ^Actor)
     // Guns
     //
 
-    if queedo.get_input_action_down(int(Input_Action.SELECT_WRENCH))
+    if get_input_action_down(.SELECT_WRENCH)
     {
         player_info.pending_gun_id = .WRENCH
     }
-    else if queedo.get_input_action_down(int(Input_Action.SELECT_PISTOL))
+    else if get_input_action_down(.SELECT_PISTOL)
     {
         player_info.pending_gun_id = .PISTOL
     }
-    else if queedo.get_input_action_down(int(Input_Action.SELECT_SHOTGUN))
+    else if get_input_action_down(.SELECT_SHOTGUN)
     {
         player_info.pending_gun_id = .SHOTGUN
     }
@@ -150,11 +149,11 @@ player_tick :: proc(player: ^Actor)
     }
 
     // Do we want to fire the current gun?
-    if queedo.get_input_action(int(Input_Action.USE_PRIMARY_ATTACK))
+    if get_input_action(.USE_PRIMARY_ATTACK)
     {
         try_use_current_gun(0)
     }
-    else if queedo.get_input_action(int(Input_Action.USE_SECONDARY_ATTACK))
+    else if get_input_action(.USE_SECONDARY_ATTACK)
     {
         try_use_current_gun(1)
     }
@@ -305,4 +304,7 @@ pistol_attack :: proc(player: ^Actor, phase: int) -> bool
 
 pistol_projectile_impact :: proc(proj: ^Actor, target: ^Actor, hit_point: Vector2, hit_normal: Vector2)
 {
+    if target == nil do return
+
+    damage_actor(proj, target, 10)
 }

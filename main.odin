@@ -9,7 +9,6 @@ import "core:os"
 import "core:runtime"
 import "core:strings"
 import "vendor:raylib"
-import "shared:queedo"
 
 
 
@@ -20,118 +19,99 @@ Vector2 :: raylib.Vector2
 
 
 
-Input_Action :: enum
-{
-    MOVE_FORWARD,
-    MOVE_BACKWARD,
-    MOVE_LEFT,
-    MOVE_RIGHT,
-
-    SELECT_WRENCH,
-    SELECT_PISTOL,
-    SELECT_SHOTGUN,
-    SELECT_RIFLE,
-    SELECT_GATLING,
-
-    USE_PRIMARY_ATTACK,
-    USE_SECONDARY_ATTACK,
-}
-
-
-
-current_frame:  int
-mouse_position: raylib.Vector2
-mouse_delta:    raylib.Vector2
+window_width:  int
+window_height: int
+should_quit:   bool
+current_frame: int
 
 
 
 main :: proc()
 {
-    s: queedo.Init_Settings;
-    s.window_title  = "Rita"
-    s.window_width  = 1600
-    s.window_height = 900
-    s.frame_rate    = FRAME_RATE
-    s.init_callback = init_game
-    s.tick_callback = tick_game
-    s.draw_callback = draw_game
-    s.quit_callback = quit_game
-
-    queedo.init(s)
-}
-
-
-
-init_game :: proc()
-{
+    context.logger = get_logger()
     os.set_current_directory("bin")
 
-    raylib.DisableCursor()
+    raylib.InitWindow(1600, 900, "Rita")
 
-    init_game_options()
-    load_game_options()
-    save_game_options()
+    init_game()
+    main_loop()
+    quit_game()
 
-    init_blueprints()
-    init_actors()
-    init_guns()
-
-    queedo.init_input_actions(len(Input_Action))
-    queedo.register_input_action(int(Input_Action.MOVE_FORWARD),         .KEYBOARD_KEY, int(raylib.KeyboardKey.W))
-    queedo.register_input_action(int(Input_Action.MOVE_BACKWARD),        .KEYBOARD_KEY, int(raylib.KeyboardKey.S))
-    queedo.register_input_action(int(Input_Action.MOVE_LEFT),            .KEYBOARD_KEY, int(raylib.KeyboardKey.A))
-    queedo.register_input_action(int(Input_Action.MOVE_RIGHT),           .KEYBOARD_KEY, int(raylib.KeyboardKey.D))
-    queedo.register_input_action(int(Input_Action.SELECT_WRENCH),        .KEYBOARD_KEY, int(raylib.KeyboardKey.ONE))
-    queedo.register_input_action(int(Input_Action.SELECT_PISTOL),        .KEYBOARD_KEY, int(raylib.KeyboardKey.TWO))
-    queedo.register_input_action(int(Input_Action.SELECT_SHOTGUN),       .KEYBOARD_KEY, int(raylib.KeyboardKey.THREE))
-    queedo.register_input_action(int(Input_Action.SELECT_RIFLE),         .KEYBOARD_KEY, int(raylib.KeyboardKey.FOUR))
-    queedo.register_input_action(int(Input_Action.SELECT_GATLING),       .KEYBOARD_KEY, int(raylib.KeyboardKey.FIVE))
-    queedo.register_input_action(int(Input_Action.USE_PRIMARY_ATTACK),   .MOUSE_BUTTON, 0)
-    queedo.register_input_action(int(Input_Action.USE_SECONDARY_ATTACK), .MOUSE_BUTTON, 1)
-
-    reset_camera()
-    load_map("data/test_map.json")
-
-    init_scanline_fx()
-
-    test()
+    raylib.CloseWindow()
 }
 
 
 
-tick_game :: proc(dt: f64)
+main_loop :: proc()
 {
-    current_frame  = queedo.current_frame
-    mouse_position = queedo.mouse_position
-    mouse_delta    = queedo.mouse_delta
+    last_time:        f64
+    fixed_step_timer: f64
+    fps_timer:        f64
+    fps_counter:      int
+    fps_value:        f64
 
-    tick_actors()
-    tick_camera()
+    for !should_quit && !raylib.WindowShouldClose()
+    {
+        //
+        // Memory
+        //
+
+        free_all(context.temp_allocator)
+
+        //
+        // Time
+        //
+
+        current_time := raylib.GetTime()
+        dt := current_time - last_time
+        last_time = current_time
+        fixed_step_timer += dt
+
+        fps_timer += dt
+        fps_counter += 1
+
+        if fps_timer > 0.5
+        {
+            fps_value = f64(fps_counter) / 0.5
+            fps_timer -= 0.5
+            fps_counter = 0
+        }
+
+        //
+        // Events
+        //
+
+        // ...
+
+        //
+        // Tick
+        //
+
+        tick_mouse()
+
+        for fixed_step_timer >= FIXED_DT
+        {
+            fixed_step_timer -= FIXED_DT
+            tick_debug_shapes()
+            tick_input()
+            tick_game()
+            mouse_delta = {}
+            current_frame += 1
+        }
+
+        //
+        // Render
+        //
+
+        raylib.BeginDrawing()
+        draw_game()
+        raylib.EndDrawing()
+    }
 }
 
 
 
-quit_game :: proc()
+request_quit :: proc()
 {
-}
-
-
-
-test :: proc()
-{
-    spawn_actor(.SPIDERLING, {5, 5}, 0)
-    toggle_cheat(.UNLIMITED_AMMO)
-}
-
-
-
-spiderling_tick :: proc(actor: ^Actor)
-{
-    actor.tick_timer -= 1
-
-    if actor.tick_timer > 0 do return
-
-    actor.desired_dir = angle_to_vector(rand.float32_range(0, math.TAU))
-    actor.tick_timer = 45
-    queedo.draw_debug_line(actor.position, actor.position + actor.desired_dir, ONE_PX_THICKNESS_SCALE, raylib.YELLOW, 45)
+    should_quit = true
 }

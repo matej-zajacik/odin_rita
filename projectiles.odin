@@ -8,7 +8,6 @@ import "core:os"
 import "core:runtime"
 import "core:strings"
 import "vendor:raylib"
-import "shared:queedo"
 
 
 
@@ -32,7 +31,7 @@ spawn_projectile :: proc(source: ^Actor, id: Actor_Id, position: Vector2, angle:
 
 projectile_did_hit_actor :: proc(proj: ^Actor, target: ^Actor, point: Vector2, normal: Vector2)
 {
-    queedo.draw_debug_line(point, point + normal, ONE_PX_THICKNESS_SCALE, raylib.GREEN, 60)
+    draw_debug_line(point, point + normal, ONE_PX_THICKNESS_SCALE, raylib.GREEN, 60)
 
     if proj.bp.impact_proc != nil
     {

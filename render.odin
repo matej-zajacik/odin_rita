@@ -4,7 +4,6 @@ import "core:fmt"
 import "core:math"
 import "core:strings"
 import "vendor:raylib"
-import "shared:queedo"
 
 
 
@@ -37,6 +36,8 @@ init_scanline_fx :: proc()
 
 draw_game :: proc()
 {
+    raylib.ClearBackground({})
+
     raylib.BeginMode2D(main_cam)
     {
         raylib.DrawTextureEx(map_tex, {}, 0.0, 1.0 / TILE_SIZE, raylib.WHITE)
@@ -51,7 +52,7 @@ draw_game :: proc()
         // We only draw debug colliders.
         draw_colliders()
 
-        queedo.draw_debug_shapes()
+        draw_debug_shapes()
     }
     raylib.EndMode2D()
 

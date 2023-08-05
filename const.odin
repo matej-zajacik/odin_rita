@@ -7,6 +7,7 @@ package main
 //
 
 FRAME_RATE :: 60
+FIXED_DT   :: 1.0 / FRAME_RATE
 MAX_ACTORS :: 256
 
 //

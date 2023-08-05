@@ -8,7 +8,7 @@ import "core:mem"
 import "core:encoding/json"
 import "core:slice"
 import "vendor:raylib"
-import "shared:util"
+import "util"
 
 
 

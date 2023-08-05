@@ -6,12 +6,11 @@ import "core:math"
 import "core:math/linalg"
 import "core:slice"
 import "vendor:raylib"
-import "shared:queedo"
 
 
 
 // Should be called when the actor's position is supposed to suddenly change (when spawned, teleported, and such).
-// Standard movement code doesn't call this.
+// Standard actor movement calls this for every actor that is finished moving for the given frame.
 set_actor_position :: proc(actor: ^Actor, position: Vector2)
 {
     actor.position = position
@@ -54,10 +53,7 @@ move_actors :: proc(mobile_actors: [dynamic]^Actor)
         // log.infof("move_actors: %v did %v iterations", actor.id, iterations)
     }
 
-    //
     // Update sectors
-    //
-
     for actor in mobile_actors
     {
         if .MOVED_THIS_FRAME not_in actor.flags do continue

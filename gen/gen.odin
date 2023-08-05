@@ -5,7 +5,7 @@ import "core:log"
 import "core:os"
 import "core:strings"
 import "shared:codegen"
-import "shared:util"
+import "../util"
 
 
 
