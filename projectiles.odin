@@ -13,7 +13,7 @@ import "vendor:raylib"
 
 spawn_projectile :: proc(source: ^Actor, id: Actor_Id, position: Vector2, angle: f32) -> ^Actor
 {
-    assert(.PROJECTILE in blueprints[id].flags)
+    assert(.PROJECTILE in actor_blueprints[id].flags)
 
     proj := spawn_actor(id, position, angle)
 
@@ -29,13 +29,13 @@ spawn_projectile :: proc(source: ^Actor, id: Actor_Id, position: Vector2, angle:
 
 
 
-projectile_did_hit_actor :: proc(proj: ^Actor, target: ^Actor, point: Vector2, normal: Vector2)
+projectile_did_hit_actor :: proc(proj: ^Actor, target: ^Actor, hit_point: Vector2, hit_normal: Vector2)
 {
-    draw_debug_line(point, point + normal, ONE_PX_THICKNESS_SCALE, raylib.GREEN, 60)
+    draw_debug_line(false, hit_point, hit_point + hit_normal, ONE_PX_THICKNESS_SCALE, raylib.GREEN, 60)
 
     if proj.bp.impact_proc != nil
     {
-        proj.bp.impact_proc(proj, target, point, normal)
+        proj.bp.impact_proc(proj, target, hit_point, hit_normal)
     }
 
     remove_actor(proj)

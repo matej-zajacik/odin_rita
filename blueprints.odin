@@ -55,17 +55,53 @@ Actor_Blueprint :: struct
 
 
 
-blueprints: [len(Actor_Id)]Actor_Blueprint
+Sound_Blueprint :: struct
+{
+    id:        Sound_Id,
+    files:     string,
+    flags:     Sound_Flags,
+    volume:    f32,
+    pitch:     f32,
+    min_range: f32,
+    max_range: f32,
+}
+
+
+
+Emitter_Blueprint :: struct
+{
+    id:                     Emitter_Id,
+    flags:                  Emitter_Flags,
+    spawn_rate:             [2]f32,
+    emission_angle:         f32,
+    particle_speed:         [2]f32,
+    particle_angular_speed: [2]f32,
+    particle_size:          [2]f32,
+    particle_drag:          [2]f32,
+    particle_color:         [2]Color,
+    particle_lifetime:      [2]int,
+}
+
+
+
+actor_blueprints: [len(Actor_Id)]Actor_Blueprint
+sound_blueprints: [len(Sound_Id)]Sound_Blueprint
+emitter_blueprints: [len(Emitter_Id)]Emitter_Blueprint
 
 
 
 init_blueprints :: proc()
 {
-    load_blueprints()
+    // We load various blueprints here from the `generated.odin` file.
+    // These basically just fill up arrays with fixed data.
+
+    load_actor_blueprints()
+    // load_sound_blueprints()
+    load_emitter_blueprints()
 
     // Certain values need further processing.
     // At runtime, we want everything to be in "units per frame", but JSON data is in "units per second" which is more natural for humans.
-    for &bp in blueprints
+    for &bp in actor_blueprints
     {
         bp.speed /= FRAME_RATE
         bp.acceleration /= FRAME_RATE

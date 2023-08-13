@@ -304,7 +304,17 @@ pistol_attack :: proc(player: ^Actor, phase: int) -> bool
 
 pistol_projectile_impact :: proc(proj: ^Actor, target: ^Actor, hit_point: Vector2, hit_normal: Vector2)
 {
-    if target == nil do return
+    if target == nil
+    {
+        em := spawn_emitter(.PISTOL_IMPACT, hit_point, vector_to_angle(hit_normal))
+        remove_emitter(em, 1)
+    }
+    else
+    {
+        emitter_id := .MECHANICAL in target.flags ? Emitter_Id.PISTOL_IMPACT : Emitter_Id.FLESH_IMPACT
+        em := spawn_emitter(emitter_id, hit_point, vector_to_angle(hit_normal))
+        remove_emitter(em, 1)
 
-    damage_actor(proj, target, 10)
+        damage_actor(proj, target, 10)
+    }
 }

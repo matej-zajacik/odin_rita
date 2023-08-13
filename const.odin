@@ -6,9 +6,11 @@ package main
 // Core
 //
 
-FRAME_RATE :: 60
-FIXED_DT   :: 1.0 / FRAME_RATE
-MAX_ACTORS :: 256
+FRAME_RATE   :: 60
+FIXED_DT     :: 1.0 / FRAME_RATE
+MAX_ACTORS   :: 256
+MAX_SOUNDS   :: 64
+MAX_EMITTERS :: 64
 
 //
 // Map

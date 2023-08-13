@@ -2,6 +2,7 @@ package util
 
 import "core:encoding/json"
 import "core:fmt"
+import "core:intrinsics"
 import "core:log"
 import "core:os"
 import "core:path/filepath"
@@ -74,29 +75,28 @@ write_obj_to_json_file :: proc(obj: ^$T, file_name: string)
 
 parse_bit_set :: proc(str: string) -> string
 {
-    b: strings.Builder
-    strings.builder_init(&b, context.temp_allocator)
+    sb := strings.builder_make(context.temp_allocator)
+    defer strings.builder_destroy(&sb)
 
     tokens, err := strings.split(str, ",", context.temp_allocator)
     fmt.assertf(err == nil, "%v", err)
 
-    strings.builder_reset(&b)
-    strings.write_string(&b, "{")
+    strings.write_string(&sb, "{")
 
     for token, i in tokens
     {
         token := strings.trim_space(token)
-        strings.write_string(&b, fmt.tprintf(".%v", token))
+        strings.write_string(&sb, fmt.tprintf(".%v", token))
 
         if i < len(tokens) - 1
         {
-            strings.write_string(&b, ", ")
+            strings.write_string(&sb, ", ")
         }
     }
 
-    strings.write_string(&b, "}")
+    strings.write_string(&sb, "}")
 
-    return strings.to_string(b)
+    return strings.to_string(sb)
 }
 
 
@@ -104,4 +104,28 @@ parse_bit_set :: proc(str: string) -> string
 parse_proc :: proc(str: string) -> string
 {
     return len(str) > 0 ? str : "nil"
+}
+
+
+
+parse_array :: proc(arr: $T/[$N]$E) -> string where intrinsics.type_is_numeric(T)
+{
+    sb := strings.builder_make(context.temp_allocator)
+    defer strings.builder_destroy(&sb)
+
+    strings.write_string(&sb, "{")
+
+    for v, i in arr
+    {
+        strings.write_string(&sb, fmt.tprintf("%v", v))
+
+        if i < len(arr) - 1
+        {
+            strings.write_string(&sb, ", ")
+        }
+    }
+
+    strings.write_string(&sb, "}")
+
+    return strings.to_string(sb)
 }

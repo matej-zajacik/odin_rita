@@ -49,15 +49,19 @@ draw_game :: proc()
             // We don't draw actors yet.
         }
 
+        draw_emitters()
+
         // We only draw debug colliders.
         draw_colliders()
 
-        draw_debug_shapes()
+        draw_debug_shapes(false)
     }
     raylib.EndMode2D()
 
-    text := strings.clone_to_cstring(fmt.tprintf("ang: %v (%v°)", player.angle, math.to_degrees(player.angle)), context.temp_allocator)
-    raylib.DrawText(text, 8, 8, 16, raylib.WHITE)
+    draw_debug_shapes(true)
+
+    // text := strings.clone_to_cstring(fmt.tprintf("ang: %v (%v°)", player.angle, math.to_degrees(player.angle)), context.temp_allocator)
+    // raylib.DrawText(text, 8, 8, 16, raylib.WHITE)
 
     raylib.DrawTexture(scanline_tex, 0, 0, raylib.WHITE)
 }

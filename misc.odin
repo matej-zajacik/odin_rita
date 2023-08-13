@@ -4,6 +4,7 @@ import "core:encoding/json"
 import "core:log"
 import "core:math"
 import "core:math/linalg"
+import "core:math/rand"
 import "core:os"
 import "core:slice"
 import "core:strings"
@@ -237,4 +238,57 @@ draw_circle :: proc(center: Vector2, radius: f32, thick: f32, color: Color, segm
         raylib.DrawLineEx(start, end, thick, color)
         start = end
     }
+}
+
+
+
+get_random_byte :: proc(min, max: byte) -> byte
+{
+    return byte(get_random_int(int(min), int(max)))
+}
+
+
+
+get_random_int :: proc(min, max: int) -> int
+{
+    temp_min := math.min(min, max)
+    temp_max := math.max(min, max)
+    range := math.abs(temp_max - temp_min) + 1
+    return temp_min + rand.int_max(range)
+}
+
+
+
+get_random_f32 :: proc(min, max: f32) -> f32
+{
+    return rand.float32_range(min, max)
+}
+
+
+
+init_array_of_free_indexes :: proc(arr: ^[dynamic]int, count: int)
+{
+    for i in 0..<count
+    {
+        append(arr, count - 1 - i)
+    }
+}
+
+
+
+get_index_from_array_of_free_indexes :: proc(arr: ^[dynamic]int) -> int
+{
+    if len(arr) == 0
+    {
+        log.panic("get_index_from_array_of_free_indexes: array has no entries left")
+    }
+
+    return pop(arr)
+}
+
+
+
+put_index_to_array_of_free_indexes :: proc(arr: ^[dynamic]int, index: int)
+{
+    append(arr, index)
 }

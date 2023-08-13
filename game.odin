@@ -1,5 +1,6 @@
 package main
 
+import "core:log"
 import "core:math"
 import "core:math/rand"
 import "vendor:raylib"
@@ -14,8 +15,10 @@ init_game :: proc()
     load_game_options()
     save_game_options()
 
+    init_sounds()
     init_blueprints()
-    init_actors()
+    init_array_of_free_indexes(&free_actor_indexes, MAX_ACTORS)
+    init_array_of_free_indexes(&free_emitter_indexes, MAX_EMITTERS)
     init_guns()
 
     register_input_action(.MOVE_FORWARD,         .KEYBOARD_KEY, int(raylib.KeyboardKey.W))
@@ -44,6 +47,7 @@ tick_game :: proc()
 {
     tick_actors()
     tick_camera()
+    tick_emitters()
 }
 
 
@@ -70,5 +74,5 @@ spiderling_tick :: proc(actor: ^Actor)
 
     actor.desired_dir = angle_to_vector(rand.float32_range(0, math.TAU))
     actor.tick_timer = 45
-    draw_debug_line(actor.position, actor.position + actor.desired_dir, ONE_PX_THICKNESS_SCALE, raylib.YELLOW, 45)
+    draw_debug_line(false, actor.position, actor.position + actor.desired_dir, ONE_PX_THICKNESS_SCALE, raylib.YELLOW, 45)
 }

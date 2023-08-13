@@ -1,5 +1,5 @@
 {
-    "items": [
+    "actors": [
         {
             "id": "PLAYER",
             "flags": "DAMAGEABLE, MOBILE, PAWN, TARGETABLE",
@@ -30,6 +30,44 @@
             "health": 30,
             "faction": "EVIL",
             "default_proc": "spiderling_tick"
+        }
+    ],
+
+    "sounds": [
+        {
+            "id": "PISTOL_FIRE",
+            "file": "data/snd_pistol.wav",
+            "volume": 0.5,
+            "pitch": 1,
+            "min_range": 3,
+            "max_range": 7
+        }
+    ],
+
+    "emitters": [
+        {
+            "id":                     "PISTOL_IMPACT",
+            "flags":                  "FADE_OUT",
+            "spawn_rate":             [300, 480],
+            "emission_angle":         0.5,
+            "particle_speed":         [0.05, 0.1],
+            "particle_angular_speed": [0.1, 0.3],
+            "particle_size":          [0.02, 0.03],
+            "particle_drag":          [0.95, 0.97],
+            "particle_color":         [[255, 255, 0, 255], [255, 128, 0, 255]],
+            "particle_lifetime":      [30, 45]
+        },
+        {
+            "id":                     "FLESH_IMPACT",
+            "flags":                  "FADE_OUT",
+            "spawn_rate":             [300, 480],
+            "emission_angle":         0.5,
+            "particle_speed":         [0.025, 0.075],
+            "particle_angular_speed": [0.1, 0.3],
+            "particle_size":          [0.025, 0.05],
+            "particle_drag":          [0.99, 0.995],
+            "particle_color":         [[255, 0, 0, 255], [255, 64, 0, 255]],
+            "particle_lifetime":      [45, 120]
         }
     ]
 }

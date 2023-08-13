@@ -28,6 +28,7 @@ Actor_Flag :: enum
 {
     DAMAGEABLE,
     IN_PLAY,
+    MECHANICAL,
     MOBILE,
     MOVED_THIS_FRAME,
     PAWN,
@@ -120,28 +121,16 @@ free_actor_indexes: [dynamic]int
 
 
 
-init_actors :: proc()
-{
-    for i in 0..<MAX_ACTORS
-    {
-        append(&free_actor_indexes, MAX_ACTORS - 1 - i)
-    }
-}
-
-
-
 spawn_actor :: proc(id: Actor_Id, position: Vector2, angle: f32) -> ^Actor
 {
-    assert(len(free_actor_indexes) > 0)
-
-    array_index := pop(&free_actor_indexes)
+    array_index := get_index_from_array_of_free_indexes(&free_actor_indexes)
     actor := &actors[array_index]
 
     //
     // Identity
     //
 
-    bp := &blueprints[id]
+    bp := &actor_blueprints[id]
     actor.id = id
     actor.bp = bp
 
@@ -222,7 +211,7 @@ tick_actors :: proc()
         {
             if current_frame == actor.removal_frame + 2
             {
-                append(&free_actor_indexes, index)
+                put_index_to_array_of_free_indexes(&free_actor_indexes, index)
             }
 
             continue

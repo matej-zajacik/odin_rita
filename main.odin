@@ -14,7 +14,6 @@ import "vendor:raylib"
 
 Color   :: raylib.Color
 Rect    :: raylib.Rectangle
-Sound   :: raylib.Sound
 Vector2 :: raylib.Vector2
 
 
@@ -31,6 +30,7 @@ main :: proc()
     context.logger = get_logger()
     os.set_current_directory("bin")
 
+    raylib.SetTraceLogLevel(.NONE)
     raylib.InitWindow(1600, 900, "Rita")
 
     init_game()
