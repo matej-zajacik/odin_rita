@@ -9,7 +9,7 @@ import "vendor:raylib"
 
 init_game :: proc()
 {
-    raylib.DisableCursor()
+    // raylib.DisableCursor()
 
     init_game_options()
     load_game_options()
@@ -20,6 +20,8 @@ init_game :: proc()
     init_array_of_free_indexes(&free_actor_indexes, MAX_ACTORS)
     init_array_of_free_indexes(&free_emitter_indexes, MAX_EMITTERS)
     init_guns()
+
+    font_tex = raylib.LoadTexture("data/font_mono.png")
 
     register_input_action(.MOVE_FORWARD,         .KEYBOARD_KEY, int(raylib.KeyboardKey.W))
     register_input_action(.MOVE_BACKWARD,        .KEYBOARD_KEY, int(raylib.KeyboardKey.S))
@@ -37,6 +39,7 @@ init_game :: proc()
     load_map("data/test_map.json")
 
     init_scanline_fx()
+    init_tui()
 
     test()
 }

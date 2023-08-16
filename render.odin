@@ -7,7 +7,8 @@ import "vendor:raylib"
 
 
 
-scanline_tex: raylib.Texture
+scanline_tex: Texture2D
+font_tex: Texture2D
 
 
 
@@ -64,4 +65,8 @@ draw_game :: proc()
     // raylib.DrawText(text, 8, 8, 16, raylib.WHITE)
 
     raylib.DrawTexture(scanline_tex, 0, 0, raylib.WHITE)
+
+    tick_tui()
+
+    // raylib.DrawTextureEx(font_tex, {32, 32}, 0, 2, raylib.WHITE)
 }

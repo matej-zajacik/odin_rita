@@ -12,9 +12,10 @@ import "vendor:raylib"
 
 
 
-Color   :: raylib.Color
-Rect    :: raylib.Rectangle
-Vector2 :: raylib.Vector2
+Color     :: raylib.Color
+Rect      :: raylib.Rectangle
+Vector2   :: raylib.Vector2
+Texture2D :: raylib.Texture2D
 
 
 

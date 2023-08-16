@@ -10,7 +10,7 @@ Top-down shooter written in Odin &amp; Raylib.
     - [x] Projectile collision.
     - [x] Change actor move code to prevent tunneling.
     - [x] Pistol projectile attack for starters.
-- [ ] Make a particle system.
+- [x] Make a particle system.
 - [ ] Make a sound system.
     - Sounds should be able to attach to actors and play at their position.
     - Some non-positional sounds just play.

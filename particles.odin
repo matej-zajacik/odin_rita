@@ -129,14 +129,22 @@ tick_emitters :: proc()
             }
         }
 
-        for &p, i in emitter.particles
+        i := 0
+        c := len(emitter.particles)
+        for i < c
         {
-            tick_particle(&p, bp.flags)
+            p := &emitter.particles[i]
+
+            tick_particle(p, bp.flags)
 
             if p.timer == 0
             {
                 unordered_remove(&emitter.particles, i)
+                i -= 1
+                c -= 1
             }
+
+            i += 1
         }
 
         if emitter.removal_frame == current_frame
