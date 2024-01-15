@@ -7,14 +7,14 @@ import "core:slice"
 
 
 
-actor_is_attacking :: proc(actor: ^Actor) -> bool
+actor_is_attacking :: proc(actor: ^actor_t) -> bool
 {
     return actor.attack_proc != nil
 }
 
 
 
-start_attack :: proc(actor: ^Actor, attack_proc: Attack_Proc)
+start_attack :: proc(actor: ^actor_t, attack_proc: attack_proc_t)
 {
     actor.attack_proc = attack_proc
     actor.attack_phase = 0
@@ -23,7 +23,7 @@ start_attack :: proc(actor: ^Actor, attack_proc: Attack_Proc)
 
 
 
-advance_attack :: proc(actor: ^Actor, delay: int, phase_delta: int = 1)
+advance_attack :: proc(actor: ^actor_t, delay: int, phase_delta: int = 1)
 {
     actor.attack_timer = delay
     actor.attack_phase += phase_delta
@@ -31,7 +31,7 @@ advance_attack :: proc(actor: ^Actor, delay: int, phase_delta: int = 1)
 
 
 
-get_closest_target_for_melee_attack :: proc(source: ^Actor, max_distance: f32, max_angle: f32) -> ^Actor
+get_closest_target_for_melee_attack :: proc(source: ^actor_t, max_distance: f32, max_angle: f32) -> ^actor_t
 {
     targets := get_attack_targets(source, source.sector, source.position, source.angle, max_distance, max_angle)
     sort_actors_by_distance(source.position, targets)
@@ -40,9 +40,9 @@ get_closest_target_for_melee_attack :: proc(source: ^Actor, max_distance: f32, m
 
 
 
-get_attack_targets :: proc(ignored_actor: ^Actor, sector: ^Sector, position: Vector2, forward_angle: f32, max_distance: f32, max_angle: f32) -> []^Actor
+get_attack_targets :: proc(ignored_actor: ^actor_t, sector: ^sector_t, position: vec2_t, forward_angle: f32, max_distance: f32, max_angle: f32) -> []^actor_t
 {
-    targets := make([dynamic]^Actor, context.temp_allocator)
+    targets := make([dynamic]^actor_t, context.temp_allocator)
 
     for target in sector.actors
     {
@@ -88,13 +88,13 @@ get_attack_targets :: proc(ignored_actor: ^Actor, sector: ^Sector, position: Vec
 
 
 @(private="file")
-sort_actors_by_distance_position: Vector2
+sort_actors_by_distance_position: vec2_t
 
-sort_actors_by_distance :: proc(position: Vector2, arr: []^Actor)
+sort_actors_by_distance :: proc(position: vec2_t, arr: []^actor_t)
 {
     sort_actors_by_distance_position = position
 
-    slice.sort_by(arr, proc(a, b: ^Actor) -> bool
+    slice.sort_by(arr, proc(a, b: ^actor_t) -> bool
     {
         return linalg.distance(sort_actors_by_distance_position, a.position) < linalg.distance(sort_actors_by_distance_position, b.position)
     })

@@ -12,7 +12,7 @@ import "util"
 
 
 
-Map_JSON :: struct
+map_json_t :: struct
 {
     compressionlevel: int,
     width:            int,
@@ -39,8 +39,8 @@ Map_JSON :: struct
 
 
 
-geo_colliders: [dynamic]Rect
-map_tex:       raylib.Texture2D
+geo_colliders: [dynamic]rect_t
+map_tex:       tex_t
 map_width:     int
 map_height:    int
 
@@ -48,29 +48,29 @@ map_height:    int
 
 load_map :: proc(file_name: string)
 {
-    map_json: Map_JSON
+    map_json: map_json_t
     util.read_json_file_to_obj(file_name, &map_json)
 
     map_width = map_json.width
     map_height = map_json.height
 
-    player_start_position: Vector2
+    player_start_position: vec2_t
     player_start_found:    bool
 
     // Load the tileset image.
-    tileset_image := raylib.LoadImage("data/tex_tileset_lab.png")
+    tileset_image    := raylib.LoadImage("data/tex_tileset_lab.png")
     image_w, image_h := tileset_image.width, tileset_image.height
-    horiz_tiles := image_w / TILE_SIZE
-    vert_tiles := image_h / TILE_SIZE
-    tile_count := horiz_tiles * vert_tiles
+    horiz_tiles      := image_w / TILE_SIZE
+    vert_tiles       := image_h / TILE_SIZE
+    tile_count       := horiz_tiles * vert_tiles
 
-    tileset_quads := make([]Rect, tile_count, context.temp_allocator)
+    tileset_quads := make([]rect_t, tile_count, context.temp_allocator)
     
     for i in 0..<tile_count
     {
         x := f32(i % horiz_tiles) * TILE_SIZE
         y := math.floor(f32(i) / f32(horiz_tiles)) * TILE_SIZE
-        quad := Rect{x, y, TILE_SIZE, TILE_SIZE}
+        quad := rect_t{x, y, TILE_SIZE, TILE_SIZE}
         tileset_quads[i] = quad
     }
 
@@ -142,7 +142,7 @@ load_map :: proc(file_name: string)
 
                     // Draw the tile to the canvas.
                     src_rect := tileset_quads[tile_gid - 1]
-                    dst_rect := Rect{f32(x * TILE_SIZE), f32(y * TILE_SIZE), src_rect.width, src_rect.height}
+                    dst_rect := rect_t{f32(x * TILE_SIZE), f32(y * TILE_SIZE), src_rect.width, src_rect.height}
 
                     tile_image := raylib.ImageFromImage(tileset_image, src_rect)
 
@@ -197,7 +197,7 @@ load_map :: proc(file_name: string)
                     {
                         for &obj in layer.objects
                         {
-                            r := Rect{f32(obj.x) / TILE_SIZE, f32(obj.y)  / TILE_SIZE, f32(obj.width)  / TILE_SIZE, f32(obj.height)  / TILE_SIZE}
+                            r := rect_t{f32(obj.x) / TILE_SIZE, f32(obj.y)  / TILE_SIZE, f32(obj.width)  / TILE_SIZE, f32(obj.height)  / TILE_SIZE}
                             append(&geo_colliders, r)
                         }
                     }
@@ -222,9 +222,9 @@ load_map :: proc(file_name: string)
 
 
 
-    get_object_position :: proc(x: int, y: int) -> Vector2
+    get_object_position :: proc(x: int, y: int) -> vec2_t
     {
-        return Vector2{f32(x + HALF_TILE_SIZE) / TILE_SIZE, f32(y + HALF_TILE_SIZE) / TILE_SIZE}
+        return vec2_t{f32(x + HALF_TILE_SIZE) / TILE_SIZE, f32(y + HALF_TILE_SIZE) / TILE_SIZE}
     }
 }
 
@@ -234,20 +234,20 @@ load_map :: proc(file_name: string)
 // Sectors
 //
 
-Sector :: struct
+sector_t :: struct
 {
-    neighbors:        [dynamic]^Sector,
-    geo_colliders:    [dynamic]^Rect,
-    actors:           [dynamic]^Actor,
+    neighbors:        [dynamic]^sector_t,
+    geo_colliders:    [dynamic]^rect_t,
+    actors:           [dynamic]^actor_t,
 
     debug_tile_pos_x: int,
     debug_tile_pos_y: int,
-    debug_rect:       Rect,
+    debug_rect:       rect_t,
 }
 
 
 
-sectors:     []Sector
+sectors:     []sector_t
 sector_cols: int
 sector_rows: int
 
@@ -267,7 +267,7 @@ init_sectors :: proc()
     sector_cols = ((map_width - 1) / SECTOR_SIZE) + 1
     sector_rows = ((map_height - 1) / SECTOR_SIZE) + 1
 
-    sectors = make([]Sector, sector_cols * sector_rows)
+    sectors = make([]sector_t, sector_cols * sector_rows)
 
     for &sector, i in sectors
     {
@@ -277,7 +277,7 @@ init_sectors :: proc()
         sector.debug_tile_pos_x = x
         sector.debug_tile_pos_y = y
         // sector.debug_rect = Rect{f32(x * TILE_SIZE * SECTOR_SIZE), f32(y * TILE_SIZE * SECTOR_SIZE), f32(TILE_SIZE * SECTOR_SIZE), f32(TILE_SIZE * SECTOR_SIZE)}
-        sector.debug_rect = Rect{f32(x * SECTOR_SIZE), f32(y * SECTOR_SIZE), f32(SECTOR_SIZE), f32(SECTOR_SIZE)}
+        sector.debug_rect = rect_t{f32(x * SECTOR_SIZE), f32(y * SECTOR_SIZE), f32(SECTOR_SIZE), f32(SECTOR_SIZE)}
 
         //
         // Neighbor sectors
@@ -338,7 +338,7 @@ init_sectors :: proc()
     // Geometry colliders
     //
 
-    temp_colliders := make([dynamic]^Rect, context.temp_allocator)
+    temp_colliders := make([dynamic]^rect_t, context.temp_allocator)
     reserve(&temp_colliders, 64)
 
     for &sector, i in sectors
@@ -357,7 +357,7 @@ init_sectors :: proc()
 
         append(&sector.geo_colliders, ..temp_colliders[:])
 
-        try_add_colliders :: proc(sector: ^Sector, arr: ^[dynamic]^Rect)
+        try_add_colliders :: proc(sector: ^sector_t, arr: ^[dynamic]^rect_t)
         {
             for &geo_collider_rect in geo_colliders
             {
@@ -372,7 +372,7 @@ init_sectors :: proc()
 
 
 
-get_sector :: #force_inline proc(x: int, y: int) -> ^Sector
+get_sector :: #force_inline proc(x: int, y: int) -> ^sector_t
 {
     return &sectors[y * sector_cols + x]
 }

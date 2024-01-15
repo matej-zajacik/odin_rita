@@ -12,17 +12,17 @@ import "vendor:raylib"
 
 
 
-Color     :: raylib.Color
-Rect      :: raylib.Rectangle
-Vector2   :: raylib.Vector2
-Texture2D :: raylib.Texture2D
+color_t :: raylib.Color
+rect_t  :: raylib.Rectangle
+vec2_t  :: raylib.Vector2
+tex_t   :: raylib.Texture2D
 
 
 
 window_width:  int
 window_height: int
 should_quit:   bool
-current_frame: int
+frame:         int
 
 
 
@@ -97,7 +97,7 @@ main_loop :: proc()
             tick_input()
             tick_game()
             mouse_delta = {}
-            current_frame += 1
+            frame += 1
         }
 
         //

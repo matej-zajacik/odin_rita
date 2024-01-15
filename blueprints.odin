@@ -2,14 +2,14 @@ package main
 
 
 
-Actor_Blueprint :: struct
+actor_blueprint_t :: struct
 {
     //
     // Identity
     //
 
-    id:    Actor_Id,
-    flags: Actor_Flags,
+    id:    actor_id_t,
+    flags: actor_flags_t,
 
     //
     // Movement & physics
@@ -25,41 +25,41 @@ Actor_Blueprint :: struct
     //
 
     health:    int,
-    faction:   Faction,
+    faction:   faction_t,
     max_range: f32,
 
     // A proc to call when the actor is first constructed.
-    make_proc: Actor_Proc,
+    make_proc: actor_proc_t,
 
     // A proc to call when the actor is spawned.
-    spawn_proc: Actor_Proc,
+    spawn_proc: actor_proc_t,
 
     // A proc to call every frame after the actor spawns.
-    default_proc: Actor_Proc,
+    default_proc: actor_proc_t,
 
     // A chase routine.
-    chase_proc: Actor_Proc,
+    chase_proc: actor_proc_t,
 
     // An attack routine.
-    attack_proc: Actor_Proc,
+    attack_proc: actor_proc_t,
 
     // Sub-attack routines.
-    sub_attack_procs: []Attack_Proc,
+    sub_attack_procs: []attack_proc_t,
 
     // A proc called while the actor is dying.
-    death_proc: Actor_Proc,
+    death_proc: actor_proc_t,
 
     // A proc to call when a projectile hits something.
-    impact_proc: Impact_Proc,
+    impact_proc: impact_proc_t,
 }
 
 
 
-Sound_Blueprint :: struct
+sound_blueprint_t :: struct
 {
-    id:        Sound_Id,
+    id:        sound_id_t,
     files:     string,
-    flags:     Sound_Flags,
+    flags:     sound_flags_t,
     volume:    f32,
     pitch:     f32,
     min_range: f32,
@@ -68,25 +68,25 @@ Sound_Blueprint :: struct
 
 
 
-Emitter_Blueprint :: struct
+emitter_blueprint_t :: struct
 {
-    id:                     Emitter_Id,
-    flags:                  Emitter_Flags,
+    id:                     emitter_id_t,
+    flags:                  emitter_flags_t,
     spawn_rate:             [2]f32,
     emission_angle:         f32,
     particle_speed:         [2]f32,
     particle_angular_speed: [2]f32,
     particle_size:          [2]f32,
     particle_drag:          [2]f32,
-    particle_color:         [2]Color,
+    particle_color:         [2]color_t,
     particle_lifetime:      [2]int,
 }
 
 
 
-actor_blueprints: [len(Actor_Id)]Actor_Blueprint
-sound_blueprints: [len(Sound_Id)]Sound_Blueprint
-emitter_blueprints: [len(Emitter_Id)]Emitter_Blueprint
+actor_blueprints:   [len(actor_id_t)]actor_blueprint_t
+sound_blueprints:   [len(sound_id_t)]sound_blueprint_t
+emitter_blueprints: [len(emitter_id_t)]emitter_blueprint_t
 
 
 

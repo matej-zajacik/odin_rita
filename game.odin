@@ -69,7 +69,7 @@ test :: proc()
 
 
 
-spiderling_tick :: proc(actor: ^Actor)
+spiderling_tick :: proc(actor: ^actor_t)
 {
     actor.tick_timer -= 1
 

@@ -5,16 +5,16 @@ import "core:math"
 
 
 
-Damage_Flag :: enum
+damage_flag_t :: enum
 {
     PIERCE_ARMOR,
 }
 
-Damage_Flags :: bit_set[Damage_Flag]
+damage_flags_t :: bit_set[damage_flag_t]
 
 
 
-damage_actor :: proc(source: ^Actor, target: ^Actor, damage: int, flags: Damage_Flags = nil)
+damage_actor :: proc(source: ^actor_t, target: ^actor_t, damage: int, flags: damage_flags_t = nil)
 {
     if .DAMAGEABLE not_in target.flags
     {
@@ -54,7 +54,7 @@ damage_actor :: proc(source: ^Actor, target: ^Actor, damage: int, flags: Damage_
 
 
 
-kill_actor :: proc(actor: ^Actor)
+kill_actor :: proc(actor: ^actor_t)
 {
     if actor.bp.death_proc != nil
     {

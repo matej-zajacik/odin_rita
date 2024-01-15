@@ -7,21 +7,21 @@ import "vendor:raylib"
 
 
 
-Sound :: miniaudio.sound
+sound_t :: miniaudio.sound
 
 
 
-Sound_Flag :: enum
+sound_flag_t :: enum
 {
     LOOP,
     NO_RANDOMIZATION,
 }
 
-Sound_Flags :: bit_set[Sound_Flag]
+sound_flags_t :: bit_set[sound_flag_t]
 
 
 
-Sound_Id :: enum
+sound_id_t :: enum
 {
     PISTOL_FIRE,
 }
@@ -29,7 +29,7 @@ Sound_Id :: enum
 
 
 audio_engine: miniaudio.engine
-sounds:       [MAX_SOUNDS]Sound
+sounds:       [MAX_SOUNDS]sound_t
 
 
 

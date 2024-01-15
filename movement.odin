@@ -11,7 +11,7 @@ import "vendor:raylib"
 
 // Should be called when the actor's position is supposed to suddenly change (when spawned, teleported, and such).
 // Standard actor movement calls this for every actor that is finished moving for the given frame.
-set_actor_position :: proc(actor: ^Actor, position: Vector2)
+set_actor_position :: proc(actor: ^actor_t, position: vec2_t)
 {
     actor.position = position
     update_actor_sector(actor)
@@ -19,21 +19,21 @@ set_actor_position :: proc(actor: ^Actor, position: Vector2)
 
 
 
-set_actor_angle :: proc(actor: ^Actor, angle: f32)
+set_actor_angle :: proc(actor: ^actor_t, angle: f32)
 {
     actor.angle = get_wrapped_angle(angle)
 }
 
 
 
-get_actor_forward :: proc(actor: ^Actor) -> Vector2
+get_actor_forward :: proc(actor: ^actor_t) -> vec2_t
 {
     return angle_to_vector(actor.angle)
 }
 
 
 
-move_actors :: proc(mobile_actors: [dynamic]^Actor)
+move_actors :: proc(mobile_actors: [dynamic]^actor_t)
 {
     for actor in mobile_actors
     {
@@ -65,7 +65,7 @@ move_actors :: proc(mobile_actors: [dynamic]^Actor)
 
 
 
-move_actor :: proc(actor: ^Actor, delta: Vector2) -> bool
+move_actor :: proc(actor: ^actor_t, delta: vec2_t) -> bool
 {
     actor.position += delta
     actor.flags += {.MOVED_THIS_FRAME}
@@ -100,7 +100,7 @@ move_actor :: proc(actor: ^Actor, delta: Vector2) -> bool
     // Actor vs geometry
     //
 
-    c := Circle{actor.position.x, actor.position.y, actor.bp.radius}
+    c := circle_t{actor.position.x, actor.position.y, actor.bp.radius}
 
     for rect in actor.sector.geo_colliders
     {
@@ -125,11 +125,11 @@ move_actor :: proc(actor: ^Actor, delta: Vector2) -> bool
 
 
 
-update_actor_sector :: proc(actor: ^Actor)
+update_actor_sector :: proc(actor: ^actor_t)
 {
     // log.infof("update_actor_sector: actor %v", actor.id)
 
-    sector: ^Sector
+    sector: ^sector_t
 
     if .IN_PLAY in actor.flags
     {
@@ -174,13 +174,13 @@ update_actor_sector :: proc(actor: ^Actor)
 
 
 // Calculates a new speed based on the actor's desired direction of movement.
-update_actor_speed :: proc(actor: ^Actor)
+update_actor_speed :: proc(actor: ^actor_t)
 {
     dir := actor.desired_dir
 
     // The rate of acceleration towards the target speed varies based on some conditions.
     acceleration_mult: f32
-    target_speed:      Vector2
+    target_speed:      vec2_t
 
     speed := actor.speed
 
@@ -221,7 +221,7 @@ update_actor_speed :: proc(actor: ^Actor)
 
 
 
-test_circle_vs_rect :: proc(c: Circle, r: Rect) -> (hit: bool, depenetration: Vector2)
+test_circle_vs_rect :: proc(c: circle_t, r: rect_t) -> (hit: bool, depenetration: vec2_t)
 {
     // Find the closest point to the rectangle.
     closest_x := math.clamp(c.x, get_rect_left(r), get_rect_right(r))

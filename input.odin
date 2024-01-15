@@ -5,16 +5,16 @@ import "vendor:raylib"
 
 
 
-Input_Action :: struct
+input_action_t :: struct
 {
-    input_method: Action_Input_Method,
+    input_method: action_input_method_t,
     bind:         int,
     state:        bool,
 }
 
 
 
-Action_Input_Method :: enum
+action_input_method_t :: enum
 {
     KEYBOARD_KEY,
     MOUSE_BUTTON,
@@ -22,7 +22,7 @@ Action_Input_Method :: enum
 
 
 
-Input_Action_Id :: enum
+input_action_id_t :: enum
 {
     MOVE_FORWARD,
     MOVE_BACKWARD,
@@ -41,14 +41,14 @@ Input_Action_Id :: enum
 
 
 
-@(private="file") current_state:  [Input_Action_Id]Input_Action
-@(private="file") previous_state: [Input_Action_Id]Input_Action
-mouse_position: Vector2
-mouse_delta:    Vector2
+@(private="file") current_state:  [input_action_id_t]input_action_t
+@(private="file") previous_state: [input_action_id_t]input_action_t
+mouse_position: vec2_t
+mouse_delta:    vec2_t
 
 
 
-register_input_action :: proc(id: Input_Action_Id, input_method: Action_Input_Method, bind: int)
+register_input_action :: proc(id: input_action_id_t, input_method: action_input_method_t, bind: int)
 {
     current_state[id].input_method = input_method
     current_state[id].bind = bind
@@ -77,21 +77,21 @@ tick_input :: proc()
 
 
 
-get_input_action :: proc(id: Input_Action_Id) -> bool
+get_input_action :: proc(id: input_action_id_t) -> bool
 {
     return current_state[id].state;
 }
 
 
 
-get_input_action_down :: proc(id: Input_Action_Id) -> bool
+get_input_action_down :: proc(id: input_action_id_t) -> bool
 {
     return !previous_state[id].state && current_state[id].state;
 }
 
 
 
-get_input_action_up :: proc(id: Input_Action_Id) -> bool
+get_input_action_up :: proc(id: input_action_id_t) -> bool
 {
     return previous_state[id].state && !current_state[id].state;
 }

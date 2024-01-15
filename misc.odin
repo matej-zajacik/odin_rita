@@ -12,7 +12,7 @@ import "vendor:raylib"
 
 
 
-Circle :: struct
+circle_t :: struct
 {
     x: f32,
     y: f32,
@@ -21,28 +21,28 @@ Circle :: struct
 
 
 
-get_rect_left :: #force_inline proc(r: Rect) -> f32
+get_rect_left :: #force_inline proc(r: rect_t) -> f32
 {
     return r.x
 }
 
 
 
-get_rect_right :: #force_inline proc(r: Rect) -> f32
+get_rect_right :: #force_inline proc(r: rect_t) -> f32
 {
     return r.x + r.width
 }
 
 
 
-get_rect_top :: #force_inline proc(r: Rect) -> f32
+get_rect_top :: #force_inline proc(r: rect_t) -> f32
 {
     return r.y
 }
 
 
 
-get_rect_bottom :: #force_inline proc(r: Rect) -> f32
+get_rect_bottom :: #force_inline proc(r: rect_t) -> f32
 {
     return r.y + r.height
 }
@@ -67,7 +67,7 @@ move_towards_f32 :: proc(src: f32, dst: f32, max_delta: f32) -> f32
 
 
 
-move_towards_vector2 :: proc(src: Vector2, dst: Vector2, max_delta: f32) -> Vector2
+move_towards_vec2 :: proc(src: vec2_t, dst: vec2_t, max_delta: f32) -> vec2_t
 {
     // Get the vector to the target point.
     v := dst - src
@@ -98,12 +98,12 @@ move_towards_vector2 :: proc(src: Vector2, dst: Vector2, max_delta: f32) -> Vect
 move_towards :: proc
 {
     move_towards_f32,
-    move_towards_vector2,
+    move_towards_vec2,
 }
 
 
 
-clamp_vector_length :: proc(v: Vector2, max_length: f32) -> Vector2
+clamp_vector_length :: proc(v: vec2_t, max_length: f32) -> vec2_t
 {
     length := linalg.length(v)
 
@@ -117,7 +117,7 @@ clamp_vector_length :: proc(v: Vector2, max_length: f32) -> Vector2
 
 
 
-rotate_vector :: proc(v: ^Vector2, angle: f32)
+rotate_vector :: proc(v: ^vec2_t, angle: f32)
 {
     sin := math.sin(angle)
     cos := math.cos(angle)
@@ -129,7 +129,7 @@ rotate_vector :: proc(v: ^Vector2, angle: f32)
 
 
 
-get_rotated_vector :: proc(v: Vector2, angle: f32) -> Vector2
+get_rotated_vector :: proc(v: vec2_t, angle: f32) -> vec2_t
 {
     sin := math.sin(angle)
     cos := math.cos(angle)
@@ -138,21 +138,21 @@ get_rotated_vector :: proc(v: Vector2, angle: f32) -> Vector2
 
 
 
-vector_to_angle :: proc(v: Vector2) -> f32
+vector_to_angle :: proc(v: vec2_t) -> f32
 {
     return get_wrapped_angle(math.atan2(-v.y, v.x))
 }
 
 
 
-angle_to_vector :: proc(angle: f32) -> Vector2
+angle_to_vector :: proc(angle: f32) -> vec2_t
 {
     return {math.cos(angle), -math.sin(angle)}
 }
 
 
 
-get_angle_between_angle_and_vector :: proc(angle: f32, vector: Vector2) -> f32
+get_angle_between_angle_and_vector :: proc(angle: f32, vector: vec2_t) -> f32
 {
     // log.infof("get_angle_between_angle_and_vector: %v vs %v", angle, vector_to_angle(vector))
     return math.angle_diff(angle, vector_to_angle(vector))
@@ -176,7 +176,7 @@ get_wrapped_angle :: proc(angle: f32) -> f32
 
 
 
-rects_intersect :: proc(a: Rect, b: Rect) -> bool
+rects_intersect :: proc(a: rect_t, b: rect_t) -> bool
 {
     return get_rect_left(a) < get_rect_right(b) &&
            get_rect_left(b) < get_rect_right(a) &&
@@ -196,7 +196,7 @@ unordered_remove_by_value :: proc(array: ^$D/[dynamic]$T, value: T)
 
 
 
-world_position_to_tile_position :: proc(world_position: Vector2) -> (x, y: int)
+world_position_to_tile_position :: proc(world_position: vec2_t) -> (x, y: int)
 {
     x = int(world_position.x / (SECTOR_SIZE * TILE_SIZE))
     y = int(world_position.y / (SECTOR_SIZE * TILE_SIZE))
@@ -227,7 +227,7 @@ mult_int :: proc
 
 
 
-draw_circle :: proc(center: Vector2, radius: f32, thick: f32, color: Color, segments: int = 16)
+draw_circle :: proc(center: vec2_t, radius: f32, thick: f32, color: color_t, segments: int = 16)
 {
     step_angle := math.TAU / f32(segments)
     start := center + {math.cos(step_angle * f32(0)), math.sin(step_angle * f32(0))} * radius

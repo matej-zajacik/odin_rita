@@ -18,8 +18,8 @@ tui: struct
     mouse_pos: [2]int,
     cursor_pos: [2]int,
     buffer_size: [2]int,
-    cols: int,
-    rows: int,
+    font_cols: int,
+    font_rows: int,
     matrix_right: f64,
     matrix_top: f64,
 }
@@ -36,8 +36,8 @@ init_tui :: proc()
     buffer_size.x = int(raylib.GetScreenWidth() / FONT_WIDTH)
     buffer_size.y = int(raylib.GetScreenHeight() / FONT_HEIGHT)
     log.infof("buffer_size: %v", buffer_size)
-    cols = int(font_tex.width / FONT_WIDTH)
-    rows = int(font_tex.height / FONT_HEIGHT)
+    font_cols = int(font_tex.width / FONT_WIDTH)
+    font_rows = int(font_tex.height / FONT_HEIGHT)
 
     matrix_right = f64(buffer_size.x) / f64(raylib.GetScreenWidth()) * 2
     matrix_top = f64(buffer_size.y) / f64(raylib.GetScreenHeight()) * 2
@@ -83,7 +83,7 @@ tick_tui :: proc()
 
 
 
-draw_rect :: proc(w, h: int, color: Color)
+draw_rect :: proc(w, h: int, color: color_t)
 {
     using tui
 
@@ -95,18 +95,18 @@ draw_rect :: proc(w, h: int, color: Color)
 
 
 
-draw_text :: proc(text: string, color: Color)
+draw_text :: proc(text: string, color: color_t)
 {
     using tui
 
-    src := Rect{0, 0, FONT_WIDTH, FONT_HEIGHT}
-    dst := Rect{f32(cursor_pos.x), f32(cursor_pos.y), 1, 1}
+    src := rect_t{0, 0, FONT_WIDTH, FONT_HEIGHT}
+    dst := rect_t{f32(cursor_pos.x), f32(cursor_pos.y), 1, 1}
 
     for r in text
     {
         index := int(r)
-        x := index % cols;
-        y := index / cols;
+        x := index % font_cols;
+        y := index / font_cols;
         src.x = f32(x * FONT_WIDTH)
         src.y = f32(y * FONT_HEIGHT)
         raylib.DrawTexturePro(font_tex, src, dst, {}, 0, color)

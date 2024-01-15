@@ -7,8 +7,8 @@ import "vendor:raylib"
 
 
 
-scanline_tex: Texture2D
-font_tex: Texture2D
+scanline_tex: tex_t
+font_tex:     tex_t
 
 
 

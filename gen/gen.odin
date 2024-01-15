@@ -9,7 +9,7 @@ import "../util"
 
 
 
-Blueprint_JSON :: struct
+blueprint_json_t :: struct
 {
     actors: [dynamic]struct
     {
@@ -62,7 +62,7 @@ main :: proc()
 {
     util.set_file_current_dir(#file)
 
-    src: Blueprint_JSON
+    src: blueprint_json_t
     util.read_json_file_to_obj("../blueprints.json", &src)
 
     cg := codegen.make_codegen()
@@ -190,7 +190,7 @@ main :: proc()
                 codegen.writef(cg, "particle_angular_speed = %v,", util.parse_array(item.particle_angular_speed))
                 codegen.writef(cg, "particle_size          = %v,", util.parse_array(item.particle_size))
                 codegen.writef(cg, "particle_drag          = %v,", util.parse_array(item.particle_drag))
-                codegen.writef(cg, "particle_color   = {{%v, %v}},", util.parse_array(item.particle_color[0]), util.parse_array(item.particle_color[1]))
+                codegen.writef(cg, "particle_color         = {{%v, %v}},", util.parse_array(item.particle_color[0]), util.parse_array(item.particle_color[1]))
                 codegen.writef(cg, "particle_lifetime      = %v,", util.parse_array(item.particle_lifetime))
             }
             codegen.close_scope(cg)

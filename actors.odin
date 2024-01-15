@@ -9,13 +9,13 @@ import "vendor:raylib"
 
 
 
-Actor_Proc  :: proc(actor: ^Actor)
-Attack_Proc :: proc(actor: ^Actor, phase: int) -> bool
-Impact_Proc :: proc(proj: ^Actor, target: ^Actor, hit_point: Vector2, hit_normal: Vector2)
+actor_proc_t  :: proc(actor: ^actor_t)
+attack_proc_t :: proc(actor: ^actor_t, phase: int) -> bool
+impact_proc_t :: proc(proj: ^actor_t, target: ^actor_t, hit_point: vec2_t, hit_normal: vec2_t)
 
 
 
-Actor_Id :: enum
+actor_id_t :: enum
 {
     PLAYER,
     PISTOL_PROJECTILE,
@@ -24,7 +24,7 @@ Actor_Id :: enum
 
 
 
-Actor_Flag :: enum
+actor_flag_t :: enum
 {
     DAMAGEABLE,
     IN_PLAY,
@@ -37,11 +37,11 @@ Actor_Flag :: enum
     WALKER,
 }
 
-Actor_Flags :: bit_set[Actor_Flag]
+actor_flags_t :: bit_set[actor_flag_t]
 
 
 
-Actor_State :: enum
+actor_state_t :: enum
 {
     DEFAULT,
     CHASE,
@@ -51,7 +51,7 @@ Actor_State :: enum
 
 
 
-Faction :: enum
+faction_t :: enum
 {
     NEUTRAL,
     GOOD,
@@ -60,19 +60,19 @@ Faction :: enum
 
 
 
-Actor :: struct
+actor_t :: struct
 {
     //
     // Identity
     //
 
-    id: Actor_Id,
+    id: actor_id_t,
 
     // A pointer to the actor's blueprint.
-    bp: ^Actor_Blueprint,
+    bp: ^actor_blueprint_t,
 
     // Current flags.
-    flags: Actor_Flags,
+    flags: actor_flags_t,
 
     //
     // Maintenance
@@ -88,40 +88,40 @@ Actor :: struct
     // Movement & physics
     //
 
-    position:     Vector2,
+    position:     vec2_t,
     angle:        f32,
-    desired_dir:  Vector2,
-    speed:        Vector2,
+    desired_dir:  vec2_t,
+    speed:        vec2_t,
     thrust_timer: int,
-    sector:       ^Sector,
+    sector:       ^sector_t,
 
     //
     // Behavior
     //
 
-    state:        Actor_State,
-    tick_proc:    Actor_Proc,
+    state:        actor_state_t,
+    tick_proc:    actor_proc_t,
     tick_phase:   int,
     tick_timer:   int,
 
-    target:       ^Actor,
-    attack_proc:  Attack_Proc,
+    target:       ^actor_t,
+    attack_proc:  attack_proc_t,
     attack_phase: int,
     attack_timer: int,
 
-    owner:        ^Actor,
+    owner:        ^actor_t,
     health:       int,
-    faction:      Faction,
+    faction:      faction_t,
 }
 
 
 
-actors:             [MAX_ACTORS]Actor
+actors:             [MAX_ACTORS]actor_t
 free_actor_indexes: [dynamic]int
 
 
 
-spawn_actor :: proc(id: Actor_Id, position: Vector2, angle: f32) -> ^Actor
+spawn_actor :: proc(id: actor_id_t, position: vec2_t, angle: f32) -> ^actor_t
 {
     array_index := get_index_from_array_of_free_indexes(&free_actor_indexes)
     actor := &actors[array_index]
@@ -142,7 +142,7 @@ spawn_actor :: proc(id: Actor_Id, position: Vector2, angle: f32) -> ^Actor
     //
 
     // Set this frame as the frame we spawned. We need this to ensure we don't tick this very frame and also to measure our lifetime, potentially.
-    actor.spawn_frame = current_frame
+    actor.spawn_frame = frame
 
     // Make sure the game doesn't remove the actor automatically later on (unless told to specifically somewhere down the line).
     actor.removal_frame = -1
@@ -186,11 +186,11 @@ spawn_actor :: proc(id: Actor_Id, position: Vector2, angle: f32) -> ^Actor
 
 
 
-remove_actor :: proc(actor: ^Actor, delay: int = 0)
+remove_actor :: proc(actor: ^actor_t, delay: int = 0)
 {
     if delay > 0
     {
-        actor.removal_frame = current_frame + delay
+        actor.removal_frame = frame + delay
         return
     }
 
@@ -202,14 +202,14 @@ remove_actor :: proc(actor: ^Actor, delay: int = 0)
 
 tick_actors :: proc()
 {
-    mobile_actors := make([dynamic]^Actor, context.temp_allocator)
+    mobile_actors := make([dynamic]^actor_t, context.temp_allocator)
 
     for &actor, index in actors
     {
         // If we're out of play and exactly two frames have passed since we got removed, we can now make this array slot available for reuse.
         if !actor_is_in_play(&actor)
         {
-            if current_frame == actor.removal_frame + 2
+            if frame == actor.removal_frame + 2
             {
                 put_index_to_array_of_free_indexes(&free_actor_indexes, index)
             }
@@ -218,7 +218,7 @@ tick_actors :: proc()
         }
 
         // If we just spawned, we don't tick.
-        if actor.spawn_frame == current_frame
+        if actor.spawn_frame == frame
         {
             continue
         }
@@ -236,7 +236,7 @@ tick_actors :: proc()
         }
 
         // Is this our hour of doom?
-        if actor.removal_frame == current_frame
+        if actor.removal_frame == frame
         {
             remove_actor(&actor)
             continue
@@ -259,14 +259,14 @@ tick_actors :: proc()
 
 
 
-actor_is_in_play :: #force_inline proc(actor: ^Actor) -> bool
+actor_is_in_play :: #force_inline proc(actor: ^actor_t) -> bool
 {
     return .IN_PLAY in actor.flags
 }
 
 
 
-set_actor_state :: proc(actor: ^Actor, new_state: Actor_State)
+set_actor_state :: proc(actor: ^actor_t, new_state: actor_state_t)
 {
     old_state := actor.state
 

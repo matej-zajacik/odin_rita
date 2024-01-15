@@ -8,7 +8,7 @@ import "core:slice"
 
 
 
-Ammo_Id :: enum
+ammo_id_t :: enum
 {
     NONE,
     BULLET,
@@ -17,7 +17,7 @@ Ammo_Id :: enum
 
 
 
-Gun_Id :: enum
+gun_id_t :: enum
 {
     NONE,
     WRENCH,
@@ -29,38 +29,38 @@ Gun_Id :: enum
 
 
 
-Gun :: struct
+gun_t :: struct
 {
-    id:           Gun_Id,
-    ammo_id:      Ammo_Id,
+    id:           gun_id_t,
+    ammo_id:      ammo_id_t,
     ammo_costs:   [2]int,
-    attack_procs: [2]Attack_Proc,
+    attack_procs: [2]attack_proc_t,
 
     unlocked:     bool,
 }
 
 
 
-Player_Info :: struct
+player_info_t :: struct
 {
     armor: int,
-    guns:  [Gun_Id]Gun,
-    ammo:  [Ammo_Id]int,
+    guns:  [gun_id_t]gun_t,
+    ammo:  [ammo_id_t]int,
 
-    pending_gun_id: Gun_Id,
-    current_gun:    ^Gun,
+    pending_gun_id: gun_id_t,
+    current_gun:    ^gun_t,
 }
 
 
 
-player:      ^Actor
-player_info: Player_Info
+player:      ^actor_t
+player_info: player_info_t
 
 
 
 init_guns :: proc()
 {
-    gun: ^Gun
+    gun: ^gun_t
 
     gun                 = &player_info.guns[.WRENCH]
     gun.id              = .WRENCH
@@ -75,14 +75,14 @@ init_guns :: proc()
 
 
 
-spawn_player :: proc(position: Vector2, angle: f32)
+spawn_player :: proc(position: vec2_t, angle: f32)
 {
     player = spawn_actor(.PLAYER, position, angle)
 }
 
 
 
-player_tick :: proc(player: ^Actor)
+player_tick :: proc(player: ^actor_t)
 {
     //
     // Angle
@@ -95,7 +95,7 @@ player_tick :: proc(player: ^Actor)
     // Movement
     //
 
-    desired_dir: Vector2
+    desired_dir: vec2_t
 
     if get_input_action(.MOVE_FORWARD)
     {
@@ -169,7 +169,7 @@ player_tick :: proc(player: ^Actor)
 
 
 
-try_switch_gun :: proc(id: Gun_Id) -> bool
+try_switch_gun :: proc(id: gun_id_t) -> bool
 {
     log.infof("try_switch_gun: trying to switch to gun %v", id)
 
@@ -204,7 +204,7 @@ try_switch_gun :: proc(id: Gun_Id) -> bool
 
 
 
-switch_gun :: proc(id: Gun_Id)
+switch_gun :: proc(id: gun_id_t)
 {
     player_info.current_gun = &player_info.guns[id]
     player_info.pending_gun_id = .NONE
@@ -251,7 +251,7 @@ use_current_gun :: proc(attack_index: int)
 
 
 
-wrench_attack :: proc(player: ^Actor, phase: int) -> bool
+wrench_attack :: proc(player: ^actor_t, phase: int) -> bool
 {
     player.attack_timer -= 1
     if player.attack_timer > 0 do return true
@@ -282,7 +282,7 @@ wrench_attack :: proc(player: ^Actor, phase: int) -> bool
 
 
 
-pistol_attack :: proc(player: ^Actor, phase: int) -> bool
+pistol_attack :: proc(player: ^actor_t, phase: int) -> bool
 {
     player.attack_timer -= 1
     if player.attack_timer > 0 do return true
@@ -302,7 +302,7 @@ pistol_attack :: proc(player: ^Actor, phase: int) -> bool
 
 
 
-pistol_projectile_impact :: proc(proj: ^Actor, target: ^Actor, hit_point: Vector2, hit_normal: Vector2)
+pistol_projectile_impact :: proc(proj: ^actor_t, target: ^actor_t, hit_point: vec2_t, hit_normal: vec2_t)
 {
     if target == nil
     {
@@ -311,7 +311,7 @@ pistol_projectile_impact :: proc(proj: ^Actor, target: ^Actor, hit_point: Vector
     }
     else
     {
-        emitter_id := .MECHANICAL in target.flags ? Emitter_Id.PISTOL_IMPACT : Emitter_Id.FLESH_IMPACT
+        emitter_id := .MECHANICAL in target.flags ? emitter_id_t.PISTOL_IMPACT : emitter_id_t.FLESH_IMPACT
         em := spawn_emitter(emitter_id, hit_point, vector_to_angle(hit_normal))
         remove_emitter(em, 1)
 

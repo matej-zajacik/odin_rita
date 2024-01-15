@@ -11,7 +11,7 @@ import "vendor:raylib"
 
 
 
-Debug_Shape_Type :: enum
+debug_shape_type_t :: enum
 {
     LINE,
     TEXT,
@@ -19,22 +19,22 @@ Debug_Shape_Type :: enum
 
 
 
-Debug_Shape :: struct
+debug_shape_t :: struct
 {
-    type:         Debug_Shape_Type,
+    type:         debug_shape_type_t,
     screen_space: bool,
-    start:        Vector2,
-    end:          Vector2,
+    start:        vec2_t,
+    end:          vec2_t,
     angle:        f32,
     thickness:    f32,
-    color:        Color,
+    color:        color_t,
     lifetime:     int,
     text:         string,
 }
 
 
 
-debug_shapes: [dynamic]Debug_Shape
+debug_shapes: [dynamic]debug_shape_t
 
 
 
@@ -81,9 +81,9 @@ draw_debug_shapes :: proc(screen_space: bool)
 
 
 
-draw_debug_line :: proc(screen_space: bool, start: Vector2, end: Vector2, thickness: f32, color: Color, duration: int = 0)
+draw_debug_line :: proc(screen_space: bool, start: vec2_t, end: vec2_t, thickness: f32, color: color_t, duration: int = 0)
 {
-    ds: Debug_Shape
+    ds: debug_shape_t
     ds.type = .LINE
     ds.screen_space = screen_space
     ds.start = start
@@ -96,9 +96,9 @@ draw_debug_line :: proc(screen_space: bool, start: Vector2, end: Vector2, thickn
 
 
 
-draw_debug_text :: proc(screen_space: bool, text: string, color: Color, duration: int = 0)
+draw_debug_text :: proc(screen_space: bool, text: string, color: color_t, duration: int = 0)
 {
-    ds: Debug_Shape
+    ds: debug_shape_t
     ds.type = .TEXT
     ds.screen_space = screen_space
     ds.text = text

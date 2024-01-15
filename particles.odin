@@ -7,17 +7,17 @@ import "vendor:raylib"
 
 
 
-Particle :: struct
+particle_t :: struct
 {
-    position:      Vector2,
-    rect:          Rect,
-    origin:        Vector2,
-    speed:         Vector2,
+    position:      vec2_t,
+    rect:          rect_t,
+    origin:        vec2_t,
+    speed:         vec2_t,
     angle:         f32,
     angular_speed: f32,
     size:          f32,
     drag:          f32,
-    color:         Color,
+    color:         color_t,
     timer:         int,
 
     lifetime:      int,
@@ -26,7 +26,7 @@ Particle :: struct
 
 
 
-Emitter_Id :: enum
+emitter_id_t :: enum
 {
     PISTOL_IMPACT,
     FLESH_IMPACT,
@@ -34,7 +34,7 @@ Emitter_Id :: enum
 
 
 
-Emitter_Flag :: enum
+emitter_flag_t :: enum
 {
     BEING_REMOVED,
     ENABLED,
@@ -42,31 +42,31 @@ Emitter_Flag :: enum
     IN_PLAY,
 }
 
-Emitter_Flags :: bit_set[Emitter_Flag]
+emitter_flags_t :: bit_set[emitter_flag_t]
 
 
 
-Emitter :: struct
+emitter_t :: struct
 {
-    bp:                     ^Emitter_Blueprint,
-    flags:                  Emitter_Flags,
-    spawn_frame:            int,
-    removal_frame:          int,
-    position:               Vector2,
-    angle:                  f32,
-    spawn_rate:             f32,
-    particles_to_spawn:     f32,
-    particles:              [dynamic]Particle,
+    bp:                 ^emitter_blueprint_t,
+    flags:              emitter_flags_t,
+    spawn_frame:        int,
+    removal_frame:      int,
+    position:           vec2_t,
+    angle:              f32,
+    spawn_rate:         f32,
+    particles_to_spawn: f32,
+    particles:          [dynamic]particle_t,
 }
 
 
 
-emitters:             [MAX_EMITTERS]Emitter
+emitters:             [MAX_EMITTERS]emitter_t
 free_emitter_indexes: [dynamic]int
 
 
 
-spawn_emitter :: proc(id: Emitter_Id, position: Vector2, angle: f32) -> ^Emitter
+spawn_emitter :: proc(id: emitter_id_t, position: vec2_t, angle: f32) -> ^emitter_t
 {
     array_index := get_index_from_array_of_free_indexes(&free_emitter_indexes)
     emitter := &emitters[array_index]
@@ -74,7 +74,7 @@ spawn_emitter :: proc(id: Emitter_Id, position: Vector2, angle: f32) -> ^Emitter
     bp := &emitter_blueprints[id]
     emitter.bp = bp
     emitter.flags = bp.flags + {.ENABLED, .IN_PLAY}
-    emitter.spawn_frame = current_frame
+    emitter.spawn_frame = frame
     emitter.removal_frame = -1
     emitter.position = position
     emitter.angle = angle
@@ -87,14 +87,14 @@ spawn_emitter :: proc(id: Emitter_Id, position: Vector2, angle: f32) -> ^Emitter
 
 
 
-remove_emitter :: proc(emitter: ^Emitter, delay: int = 0)
+remove_emitter :: proc(emitter: ^emitter_t, delay: int = 0)
 {
-    emitter.removal_frame = current_frame + delay
+    emitter.removal_frame = frame + delay
 }
 
 
 
-remove_emitter_immediately :: proc(emitter: ^Emitter)
+remove_emitter_immediately :: proc(emitter: ^emitter_t)
 {
     emitter.flags -= {.IN_PLAY}
 }
@@ -109,7 +109,7 @@ tick_emitters :: proc()
     {
         if .IN_PLAY not_in emitter.flags do continue
 
-        if emitter.spawn_frame == current_frame do continue
+        if emitter.spawn_frame == frame do continue
 
         count += 1
 
@@ -147,7 +147,7 @@ tick_emitters :: proc()
             i += 1
         }
 
-        if emitter.removal_frame == current_frame
+        if emitter.removal_frame == frame
         {
             emitter.flags -= {.ENABLED}
             emitter.flags += {.BEING_REMOVED}
@@ -161,11 +161,11 @@ tick_emitters :: proc()
 
     draw_debug_text(true, fmt.aprintf("emitters: %v", count), raylib.WHITE)
 
-    spawn_particle :: #force_inline proc(emitter: ^Emitter)
+    spawn_particle :: #force_inline proc(emitter: ^emitter_t)
     {
         bp := emitter.bp
 
-        temp: Particle = ---
+        temp: particle_t = ---
         append(&emitter.particles, temp)
 
         p := &emitter.particles[len(emitter.particles) - 1]
@@ -189,7 +189,7 @@ tick_emitters :: proc()
         p.initial_alpha = a
     }
 
-    tick_particle :: #force_inline proc(p: ^Particle, flags: Emitter_Flags) -> bool
+    tick_particle :: #force_inline proc(p: ^particle_t, flags: emitter_flags_t) -> bool
     {
         p.timer -= 1
         p.position += p.speed
